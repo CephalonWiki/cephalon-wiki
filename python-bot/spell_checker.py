@@ -1,3 +1,5 @@
+# Taken from https://norvig.com/spell-correct.html
+
 import string
 from collections import Counter
 import all_articles
