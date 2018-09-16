@@ -22,4 +22,4 @@ The python code for the bot can be organized into three blocks:
 	* **warframeWikiScrapper**:  Two main methods that lookup an article and scrapes it based on item type.
 	* **warframeWikiItemComparer**:  Calls the scrapper module to compare two items of the same type.
 
-The Text and Wiki blocks are independent, and the Reddit block imports and calls methods from both blocks. x
+The Text and Wiki blocks are independent, and the Reddit block imports and calls methods from both blocks.
