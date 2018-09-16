@@ -10,7 +10,7 @@ import warframeWikiScrapper
 import warframeWikiItemComparer
 
 # create Reddit instance
-with open("../data/credentials.txt", 'r') as login_credentials:
+with open("../../data/credentials.txt", 'r') as login_credentials:
     credentials = login_credentials.readline().split(',')
     reddit_instance = praw.Reddit(client_id=credentials[0], client_secret=credentials[1], user_agent=credentials[2],
                                   username=credentials[3], password=credentials[4])

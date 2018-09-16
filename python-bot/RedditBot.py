@@ -43,7 +43,7 @@ class RedditBot:
         print(str(datetime.datetime.now()) + ":  " + self.name + "  ]]]", message)
 
     def log_event(self, lines, event="other"):
-        with open("../logs/" + event + "-log-" + str(datetime.date.today()) + ".txt", 'a') as log:
+        with open("../../logs/" + event + "-log-" + str(datetime.date.today()) + ".txt", 'a') as log:
             log.write("\n".join(["*"*27, str(datetime.datetime.now()) + ":  " + self.name] + lines + [""]))
 
     # should be overridden by parent, return True if comment bears response
