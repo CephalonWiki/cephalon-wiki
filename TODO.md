@@ -5,6 +5,7 @@ Will be updated with ongoing goals, tasks, updates, etc.
 ##16.9.2018
 - Bot throws an exception when responding to a deleted comment.  Add clause to check for deletion in should_respond(comment)
 - Standarize naming for python files
+- Bot still responds to comments multiple times.  
 
 ##15.9.2018
 - ~~Create git repository~~
