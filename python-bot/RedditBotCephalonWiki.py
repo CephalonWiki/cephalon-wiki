@@ -18,7 +18,7 @@ with open("../../data/credentials.txt", 'r') as login_credentials:
 # For responding to comments
 header = "Hello Tenno.  Here is the information you requested.\n"
 footer = "\n\n*****\n\nBot by /u/1st_transit_of_venus | " \
-         "Code available at https://github.com/CephalonWiki/cephalon-wiki"
+         "Code available on [github](https://github.com/CephalonWiki/cephalon-wiki)"
 
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
