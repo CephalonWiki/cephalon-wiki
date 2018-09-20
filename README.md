@@ -11,7 +11,7 @@ The python code for the bot can be organized into three blocks:
 
 1.  **Reddit Block**:  Via the Python Reddit API, retrieves and posts comments on /r/Warframe.
 	* **RedditBot**:  A generic reddit comment bot.  It can be used by creating a child class and overridding the should_respond(comment) and response(comment) methods.
-	* **RedditBotCephalonWiki**:  Child class of RedditBot.  Reddit comments are passed to the Text Layer to obtain the requested article names, and the article names are passed to the Wiki Layer to obtain article information.
+	* **RedditBotCephalonWiki**:  Child class of RedditBot.  Reddit comments are passed to the Text Block to obtain the requested article names, and the article names are passed to the Wiki Block to obtain article information.
 
 2.  **Text Block**:  Text processing for reddit comments.
 	* **tagParser**:  Cleans reddit comments (eg. removes quoted text) and finds tags/requested article names based on given delimiters.
