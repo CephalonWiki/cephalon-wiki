@@ -19,7 +19,7 @@ The python code for the bot can be organized into three blocks:
 	* **all_articles**:  Dictionary of article information and list of article titles used in spell_checker module.
 
 3.  **Wiki Block**:  Scrapper for http://warframe.wikia.com/
-	* **warframeWikiScrapper**:  Two main methods that lookup an article and scrapes it based on item type.
+	* **warframeWikiScrapper**:  Two main methods that lookup an article and scrape it based on item type.
 	* **warframeWikiItemComparer**:  Calls the scrapper module to compare two items of the same type.
 
 The Text and Wiki blocks are independent, and the Reddit block imports and calls methods from both blocks.
