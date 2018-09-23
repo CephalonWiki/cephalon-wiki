@@ -10,6 +10,8 @@ import spell_checker
 
 import tagParser
 
+import CephalonWikiLogger
+
 
 # Given an article title, searches for article on wiki
 def get_article_info(title):
@@ -42,15 +44,14 @@ def get_article_info(title):
             suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
 
             if suggestions_dict:
-                return get_article_info(suggestions_dict[0]["title"])
+                corrected_title = suggestions_dict[0]["title"]
+                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
+                
+                return get_article_info(corrected_title)
             elif spell_checker.correction(title) != title and len(title) > 2:
                 corrected_title = spell_checker.correction(title)
-                print("Corrected " + title + " to " + corrected_title)
-
-                with open("../logs/spell-checker-log-" + str(datetime.date.today()) + ".txt", 'a') as log:
-                    log.write("\n".join([str(datetime.datetime.now()) + ":  " + "WarframeWikiScrapper",
-                                         "Corrected " + title + " to " + corrected_title,
-                                         ""]))
+                CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
+                
                 return get_article_info(corrected_title)
             else:
                 return article_info
@@ -85,11 +86,7 @@ def get_article_info(title):
                 if not codex_entry.endswith("."):
                     codex_entry += "."
     except KeyError as e:
-        print("KeyError: with ", str(e), " for title ", title)
-        with open("../logs/log-" + str(datetime.date.today()) + ".txt", 'a') as log:
-            log.write("\n".join([str(datetime.datetime.now()) + ":  " + "WarframeWikiScrapper",
-                                 "KeyError: with " + str(e) + " for title " + title,
-                                 ""]))
+        CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
 
     # Assemble look up information into dictionary
     article_info["type"] = article_type
@@ -200,6 +197,7 @@ def get_article_summary(title, detail=False):
                     article_summary = paragraph.strip().replace("\xa0", "")
                 except Exception:
                     article_summary = "Sorry, no summary is availablebleblebleble...IS THAT A BUG?!?!?!"
+                    CephalonWikiLogger.scrapper.exception("No summary available for %s", article_info["title"])
 
         #
         # processing for the aside
@@ -235,11 +233,7 @@ def get_article_summary(title, detail=False):
             try:
                 aside_filter = aside_filters[article_info["type"]]
             except KeyError as e:
-                print("KeyError", str(e), " with title ", title, " and type ", article_info["type"])
-                with open("../logs/unknown-type-log-" + str(datetime.date.today()) + ".txt", 'a') as log:
-                    log.write("\n".join([str(datetime.datetime.now()) + ":  " + "WarframeWikiScrapper",
-                                         "KeyError with " + str(e) + " with title " + title + " and type " + article_info["type"],
-                                         ""]))
+                CephalonWikiLogger.scrapper.exception("KeyError" + str(e) + " with title " + title + " and type " + article_info["type"])
 
             current_subheader = None
             aside_sections = list(itertools.chain(*map(lambda tag: tag.getchildren(), article_aside.findall('./section'))))

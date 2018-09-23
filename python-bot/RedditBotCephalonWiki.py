@@ -4,6 +4,8 @@ import praw
 
 import RedditBot
 
+import CephalonWikiLogger
+
 import tagParser
 
 import warframeWikiScrapper
@@ -30,6 +32,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_header(header)
         super().set_footer(footer)
         super().set_name(name)
+        super().set_logger(CephalonWikiLogger.cephalon)
 
     @staticmethod
     def should_respond(comment):
@@ -49,14 +52,14 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             if summary_details:
                 return "\n\n".join(["*****"] + summary_details)
             else:
-                self.log_event(["Requested:  " + title], "null-response")
+                self.logger.warning("Requested:  %s", title)
                 return ""
         except Exception:
             if detail:
                 return self.format_article_summary(title)
             else:
                 # log response
-                self.log_event(["Requested:  " + title], "null-response")
+                self.logger.warning("Requested:  %s", title)
                 return ""
 
     def response(self, comment):
@@ -68,8 +71,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         # Error catching for parsing layer and below
         except Exception as e:
             error_msg = "Parsing Exception raised - " + str(e) + " - in comment " + str(comment)
-            self.console_log(error_msg)
-            self.log_event([traceback.format_exc()], "exception")
+            self.logger.exception(error_msg)
 
             # if problem not with reddit, send mechanic a message
             self.mechanic.message("Parsing Exception Raised", traceback.format_exc())

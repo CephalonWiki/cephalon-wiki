@@ -1,7 +1,7 @@
 import datetime
 import time
 import traceback
-
+import logging
 
 class RedditBot:
 
@@ -15,6 +15,9 @@ class RedditBot:
 
         # bot manager
         self.mechanic = None
+        
+        # logging object
+        self.logger = logging.getLogger("bot")
 
         self.header = ""
         self.footer = ""
@@ -28,6 +31,9 @@ class RedditBot:
 
     def set_mechanic(self, mechanic_name):
         self.mechanic = self.reddit.redditor(mechanic_name)
+        
+    def set_logger(self, logger)
+        self.logger = logger
 
     def set_header(self, h):
         self.header = h
@@ -37,14 +43,6 @@ class RedditBot:
 
     def set_name(self, bot_name):
         self.name = bot_name
-
-    # for logging
-    def console_log(self, message):
-        print(str(datetime.datetime.now()) + ":  " + self.name + "  ]]]", message)
-
-    def log_event(self, lines, event="other"):
-        with open("../../logs/" + event + "-log-" + str(datetime.date.today()) + ".txt", 'a') as log:
-            log.write("\n".join(["*"*27, str(datetime.datetime.now()) + ":  " + self.name] + lines + [""]))
 
     # should be overridden by parent, return True if comment bears response
     @staticmethod
@@ -61,26 +59,23 @@ class RedditBot:
         response = self.response(comment)
 
         if response and self.should_respond(comment):
-            self.console_log("Responding to comment " + str(comment))
             comment.reply(self.header + response + self.footer)
-            event = "comment"
-        else:
-            self.console_log("Not responding to comment " + str(comment))
-            event = "null-response"
+            
+            self.logger.info("Comment id:  %s", str(comment))
+            self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
+            self.logger.info("Response text:  %s", response.strip().replace("\n", "\t"))
 
-        # log reply
-        self.log_event(["Comment id:  " + str(comment),
-                        "Comment text:  " + comment.body.strip().replace("\n", "\t"),
-                        "Response text:  " + response.strip().replace("\n", "\t")], event)
+        else:
+            self.logger.warning("Not responding to comment " + str(comment))
 
     def check(self, comment):
-        self.console_log("Reading comment " + str(comment))
+        self.logger.debug("Reading comment %s", comment)
 
         # check if we should respond
         if self.should_respond(comment):
             # 30 s window for redditor to edit comment
             nap_time = max(31 - int(time.time() - comment.created_utc), 0)
-            self.console_log("Waiting " + str(nap_time) + " seconds to respond to comment " + str(comment))
+            self.logger.debug("Waiting %s seconds to respond to comment %s", nap_time, comment)
             time.sleep(nap_time)
             self.reply(comment)
 
@@ -96,26 +91,14 @@ class RedditBot:
                 self.check(comment)
 
         except KeyboardInterrupt:
-            self.console_log("Interrupting...")
-
-        # except (praw.exceptions.PRAWException, prawcore.exceptions.PrawcoreException) as e:
-        #     error_msg = "Reddit exception raised:  " + str(e)
-        #
-        #     self.console_log(error_msg)
-        #     self.log_event([traceback.format_exc()], "exception")
-        #
-        #     # take a nap and start again
-        #     self.console_log("Napping...")
-        #     time.sleep(15)
-        #     self.scan(stream)
+            self.logger.debug("Interrupting...")
 
         except Exception as e:
             error_msg = "Exception raised:  " + str(e)
 
-            self.console_log(error_msg)
-            self.log_event([traceback.format_exc()], "exception")
+            self.logger.exception(error_msg)
 
             # take a nap and start again
-            self.console_log("Napping...")
+            self.logger.debug("Napping...")
             time.sleep(60)
             self.scan(stream)
