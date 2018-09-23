@@ -47,7 +47,7 @@ spell_checker_log.setLevel(logging.WARNING)
 # formatters #
 ##############
 
-console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(level)s - %(funcName)s -  %(message)s')
+console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(funcName)s -  %(message)s')
 log_formatter = logging.Formatter('%(asctime)s - %(name)s -  %(message)s')
 
 

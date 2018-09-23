@@ -18,6 +18,7 @@ class RedditBot:
         
         # logging object
         self.logger = logging.getLogger("bot")
+        self.logger.setLevel(logging.DEBUG)
 
         self.header = ""
         self.footer = ""
@@ -32,7 +33,7 @@ class RedditBot:
     def set_mechanic(self, mechanic_name):
         self.mechanic = self.reddit.redditor(mechanic_name)
         
-    def set_logger(self, logger)
+    def set_logger(self, logger):
         self.logger = logger
 
     def set_header(self, h):
