@@ -71,6 +71,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         # Error catching for parsing layer and below
         except Exception as e:
             error_msg = "Parsing Exception raised - " + str(e) + " - in comment " + str(comment)
+            self.logger.exception("******************************")
             self.logger.exception(error_msg)
 
             # if problem not with reddit, send mechanic a message
