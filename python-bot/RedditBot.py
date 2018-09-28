@@ -67,7 +67,7 @@ class RedditBot:
             self.logger.info("Comment id:  %s", str(comment))
             self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
             
-            response_log = "Response:  " + response.strip().replace("\n", "\t"))
+            response_log = "Response:  " + response.strip().replace("\n", "\t")
             self.logger.info(response_log)
 
         else:
