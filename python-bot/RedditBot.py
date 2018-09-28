@@ -17,7 +17,7 @@ class RedditBot:
         self.mechanic = None
         
         # logging object
-        self.logger = logging.getLogger("bot")
+        self.logger = logging.getLogger("reddit bot")
         self.logger.setLevel(logging.DEBUG)
 
         self.header = ""
@@ -58,16 +58,23 @@ class RedditBot:
     def reply(self, comment):
         # preparing response using the module
         response = self.response(comment)
+        response_log = ""
 
         if response and self.should_respond(comment):
             comment.reply(self.header + response + self.footer)
             
+            self.logger.info("******************************")
             self.logger.info("Comment id:  %s", str(comment))
             self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
-            self.logger.info("Response text:  %s", response.strip().replace("\n", "\t"))
+            
+            response_log = "Response:  " + response.strip().replace("\n", "\t"))
+            self.logger.info(response_log)
 
         else:
-            self.logger.warning("Not responding to comment " + str(comment))
+            response_log = "Not responding to comment " + str(comment)
+            self.logger.warning(response_log)
+        
+        
 
     def check(self, comment):
         self.logger.debug("Reading comment %s", comment)
