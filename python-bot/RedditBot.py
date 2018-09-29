@@ -15,16 +15,16 @@ class RedditBot:
 
         # bot manager
         self.mechanic = None
-        
-        # logging object
-        self.logger = logging.getLogger("reddit bot")
-        self.logger.setLevel(logging.DEBUG)
 
         self.header = ""
         self.footer = ""
 
         # bot name
         self.name = ""
+        
+        # logging object
+        self.logger = logging.getLogger(self.name)
+        self.logger.setLevel(logging.DEBUG)
 
     # getter/setters
     def set_subreddit(self, subreddit_name):
@@ -67,7 +67,7 @@ class RedditBot:
             self.logger.info("Comment id:  %s", str(comment))
             self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
             
-            response_log = "Response:  " + response.strip().replace("\n", "\t"))
+            response_log = "Response:  " + response.strip().replace("\n", "\t")
             self.logger.info(response_log)
 
         else:
