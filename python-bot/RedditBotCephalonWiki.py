@@ -33,6 +33,18 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_footer(footer)
         super().set_name(name)
         super().set_logger(CephalonWikiLogger.cephalon)
+        
+        #for testing
+    def __init__(self, name="Cephalon Wiki Test Bot"):
+        super().__init__(reddit_instance)
+        super().set_subreddit("cephalonwiki")
+        super().set_mechanic("1st_transit_of_venus")
+        super().set_header(header)
+        super().set_footer(footer)
+        super().set_name(name)
+        
+        super().set_logger(CephalonWikiLogger.cephalon)
+        self.logger.name = 'test-cephalon'
 
     @staticmethod
     def should_respond(comment):

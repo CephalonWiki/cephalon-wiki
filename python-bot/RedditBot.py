@@ -15,16 +15,16 @@ class RedditBot:
 
         # bot manager
         self.mechanic = None
-        
-        # logging object
-        self.logger = logging.getLogger("reddit bot")
-        self.logger.setLevel(logging.DEBUG)
 
         self.header = ""
         self.footer = ""
 
         # bot name
         self.name = ""
+        
+        # logging object
+        self.logger = logging.getLogger(self.name)
+        self.logger.setLevel(logging.DEBUG)
 
     # getter/setters
     def set_subreddit(self, subreddit_name):
