@@ -3,7 +3,7 @@ detailed_delimiters = ["{{", "}}"]
 simple_delimiters = ["{", "}"]
 
 # no one can request more than n articles at a time
-article_request_limit = 3
+article_request_limit = 10
 
 
 # All-purpose parser for nested delimited statements

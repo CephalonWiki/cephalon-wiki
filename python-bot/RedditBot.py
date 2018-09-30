@@ -56,31 +56,25 @@ class RedditBot:
         return ""
 
     def reply(self, comment):
+        self.logger.info("******************************")
+        self.logger.info("Comment id:  %s", str(comment))
+        self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
+
         # preparing response using the module
         response = self.response(comment)
-        response_log = ""
 
-        if response and self.should_respond(comment):
+        if response:
             comment.reply(self.header + response + self.footer)
-            
-            self.logger.info("******************************")
-            self.logger.info("Comment id:  %s", str(comment))
-            self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
-            
-            response_log = "Response:  " + response.strip().replace("\n", "\t")
-            self.logger.info(response_log)
-
+            self.logger.info("Response:  \n%s\n*****", response.strip())
         else:
-            response_log = "Not responding to comment " + str(comment)
-            self.logger.warning(response_log)
-        
-        
+            self.logger.warning("No response to " + str(comment))
 
     def check(self, comment):
         self.logger.debug("Reading comment %s", comment)
 
         # check if we should respond
         if self.should_respond(comment):
+            self.logger.debug("Should respond to comment %s", comment)
             # 30 s window for redditor to edit comment
             nap_time = max(31 - int(time.time() - comment.created_utc), 0)
             self.logger.debug("Waiting %s seconds to respond to comment %s", nap_time, comment)

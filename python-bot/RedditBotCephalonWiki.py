@@ -50,16 +50,18 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 summary_details = warframeWikiScrapper.get_article_summary(title, detail)
 
             if summary_details:
+                self.logger.warning("Retrieval for title %s succeeded.", title)
                 return "\n\n".join(["*****"] + summary_details)
             else:
-                self.logger.warning("Requested:  %s", title)
+                self.logger.warning("No details retrieved for title %s", title)
                 return ""
         except Exception:
+            self.logger.warning("Retrieval for title %s failed.", title)
             if detail:
+                self.logger.warning("Trying to retrieve simple version of title %s.", title)
                 return self.format_article_summary(title)
             else:
-                # log response
-                self.logger.warning("Requested:  %s", title)
+                self.logger.warning("No details retrieved for title %s", title)
                 return ""
 
     def response(self, comment):
@@ -71,10 +73,10 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         # Error catching for parsing layer and below
         except Exception as e:
             error_msg = "Parsing Exception raised - " + str(e) + " - in comment " + str(comment)
-            self.logger.exception("******************************")
-            self.logger.exception(error_msg)
+            self.logger.error(error_msg)
 
             # if problem not with reddit, send mechanic a message
-            self.mechanic.message("Parsing Exception Raised", traceback.format_exc())
+            # deprecate this
+            #self.mechanic.message("Parsing Exception Raised", traceback.format_exc())
 
             return ""
