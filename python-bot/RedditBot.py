@@ -64,8 +64,13 @@ class RedditBot:
         response = self.response(comment)
 
         if response:
+            self.logger.info("Response text:")
+            for s in response.strip().split("\n"):
+                self.logger.info(s)
+            self.logger.info("*****")
+
             comment.reply(self.header + response + self.footer)
-            self.logger.info("Response:  \n%s\n*****", response.strip())
+            self.logger.info("Response posted to Reddit.")
         else:
             self.logger.warning("No response to " + str(comment))
 
@@ -98,7 +103,7 @@ class RedditBot:
         except Exception as e:
             error_msg = "Exception raised:  " + str(e)
 
-            self.logger.exception(error_msg)
+            self.logger.error(error_msg)
 
             # take a nap and start again
             self.logger.debug("Napping...")

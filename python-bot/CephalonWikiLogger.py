@@ -1,4 +1,5 @@
 import logging
+from logging import handlers
 import datetime
 
 
@@ -28,18 +29,18 @@ console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 
 # comment events will be logged with level INFO
-comment_log = logging.FileHandler("../../logs/comments-" + '{:%Y-%m-%d}.log'.format(datetime.datetime.now()))
+comment_log = logging.handlers.TimedRotatingFileHandler("../../logs/comments-", 'midnight')
 comment_log.setLevel(logging.INFO)
 
 # when not responding to a comment, will log a WARNING
-no_response_log = logging.FileHandler("../../logs/no-response-" + '{:%Y-%m-%d}.log'.format(datetime.datetime.now()))
+no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-", 'midnight')
 no_response_log.setLevel(logging.WARNING)
 
-exception_log = logging.FileHandler("../../logs/exceptions-" + '{:%Y-%m-%d}.log'.format(datetime.datetime.now()))
+exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-", 'midnight')
 exception_log.setLevel(logging.ERROR)
 
 # will log spelling corrections as warnings
-spell_checker_log = logging.FileHandler("../../logs/spell-checker-" + '{:%Y-%m-%d}.log'.format(datetime.datetime.now()))
+spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-", 'midnight')
 spell_checker_log.setLevel(logging.WARNING)
 
 
