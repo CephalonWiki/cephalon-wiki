@@ -233,7 +233,7 @@ def get_article_summary(title, detail=False):
             try:
                 aside_filter = aside_filters[article_info["type"]]
             except KeyError as e:
-                CephalonWikiLogger.scrapper.exception("KeyError " + str(e) + " with title " + title + " and type " + article_info["type"])
+                CephalonWikiLogger.scrapper.error("KeyError " + str(e) + " with title " + title + " and type " + article_info["type"])
 
             current_subheader = None
             aside_sections = list(itertools.chain(*map(lambda tag: tag.getchildren(), article_aside.findall('./section'))))

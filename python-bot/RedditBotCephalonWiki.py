@@ -50,7 +50,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 summary_details = warframeWikiScrapper.get_article_summary(title, detail)
 
             if summary_details:
-                self.logger.warning("Retrieval for title %s succeeded.", title)
+                self.logger.info("Retrieval for title %s succeeded.", title)
                 return "\n\n".join(["*****"] + summary_details)
             else:
                 self.logger.warning("No details retrieved for title %s", title)
@@ -58,7 +58,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         except Exception:
             self.logger.warning("Retrieval for title %s failed.", title)
             if detail:
-                self.logger.warning("Trying to retrieve simple version of title %s.", title)
+                self.logger.info("Trying to retrieve simple version of title %s.", title)
                 return self.format_article_summary(title)
             else:
                 self.logger.warning("No details retrieved for title %s", title)
