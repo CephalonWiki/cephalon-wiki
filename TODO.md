@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+3.10.2018
+- New log files are not being created; all logging is done into a file from September 30th.
+
 27.9.2018
 ~~The spell checker failed to correct "dna stabilizers" to "DNA Stabilizer".  Need to add some .lower() to the comparisons.~~ Added a dictionary to spell_checkery.py, and check spelling but not case.
 - Exceptions are logged into no-response log.  Check description in CephalonWikiLog.py
