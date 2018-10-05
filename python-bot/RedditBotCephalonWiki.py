@@ -46,11 +46,26 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_logger(CephalonWikiLogger.cephalon)
         self.logger.name = 'test-cephalon'
 
-    @staticmethod
-    def should_respond(comment):
-        reply_authors = list(map(lambda c: c.author, comment.replies.list()))
-        return ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0) \
-            and comment.author != "CephalonWiki" and "CephalonWiki" not in reply_authors
+    def should_respond(self, comment):
+        if ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0):
+            self.logger.debug("Comment contains matching braces")
+
+            if comment.author != "CephalonWiki":
+                self.logger.debug("Comment not authored by CephalonWiki")
+
+                reply_authors = list(map(lambda c: c.author, comment.replies.list()))
+                if "CephalonWiki" not in reply_authors:
+                    self.logger.debug("Have not replied to comment")
+                    return True
+                else:
+                    self.logger.info("Already replied to comment")
+                    return False
+            else:
+                self.logger.info("Comment authored by CephalonWiki")
+                return False
+        else:
+            # most comments will not contain matching braces
+            return False
 
     # prepare summary of article, as a string
     # scrapping modules used here

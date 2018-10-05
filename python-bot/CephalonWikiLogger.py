@@ -29,18 +29,23 @@ console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 
 # comment events will be logged with level INFO
-comment_log = logging.handlers.TimedRotatingFileHandler("../../logs/comments-", 'midnight')
+comment_log = logging.handlers.TimedRotatingFileHandler("../../logs/comments-log", 'midnight')
+comment_log.suffix = "%Y-%m-%d.txt"
 comment_log.setLevel(logging.INFO)
+comment_log.doRollover()
 
 # when not responding to a comment, will log a WARNING
-no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-", 'midnight')
+no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-log", 'midnight')
+no_response_log.suffix = "%Y-%m-%d.txt"
 no_response_log.setLevel(logging.WARNING)
 
-exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-", 'midnight')
+exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-log", 'midnight')
+exception_log.suffix = "%Y-%m-%d.txt"
 exception_log.setLevel(logging.ERROR)
 
 # will log spelling corrections as warnings
-spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-", 'midnight')
+spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-log", 'midnight')
+spell_checker_log.suffix = "%Y-%m-%d.txt"
 spell_checker_log.setLevel(logging.WARNING)
 
 
