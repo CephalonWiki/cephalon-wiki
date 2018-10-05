@@ -196,8 +196,8 @@ def get_article_summary(title, detail=False):
                                            "\n")).__next__()
                     article_summary = paragraph.strip().replace("\xa0", "")
                 except Exception:
-                    article_summary = "Sorry, no summary is availablebleblebleble...IS THAT A BUG?!?!?!"
-                    CephalonWikiLogger.scrapper.exception("No summary available for %s", article_info["title"])
+                    article_summary = "Sorry, no summary is availablebleblebleble... Hmm... I will attempt to bypass this fault."
+                    CephalonWikiLogger.scrapper.error("No summary available for %s", article_info["title"])
 
         #
         # processing for the aside
