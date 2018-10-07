@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+6.10.2018
+- Need to setup better delimiters on log entries
+
 3.10.2018
 ~~- New log files are not being created; all logging is done into a file from September 30th.~~ Changed FileHandler to TimedRotatingFileHandler.  New log files should be formatted with the correct date
 
