@@ -15,6 +15,7 @@ import CephalonWikiLogger
 
 # Given an article title, searches for article on wiki
 def get_article_info(title):
+    CephalonWikiLogger.scrapper.info("Searching for info on %s.", title)
 
     # access article json and convert to a dictionary
     article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + title.replace(" ", "_")
@@ -35,9 +36,11 @@ def get_article_info(title):
         # If article is not found on first run, alter title and look up again, otherwise try search suggestions
         if "&" in title:
             return get_article_info(title.replace("&", "%26"))
-        elif "and" in title:
-            return get_article_info(title.replace("and", "%26"))
+        elif " and " in title:
+            return get_article_info(title.replace(" and ", " %26 "))
         else:
+            CephalonWikiLogger.scrapper.warning("Article info not found for %s.  Checking spelling.", title)
+
             # Use search suggestions to correct query, otherwise return blank dict
             suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query="
                                             + title.replace(" ", "_"))
@@ -46,14 +49,15 @@ def get_article_info(title):
             if suggestions_dict:
                 corrected_title = suggestions_dict[0]["title"]
                 CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
-                
+
                 return get_article_info(corrected_title)
-            elif spell_checker.correction(title) != title and len(title) > 2:
+            if spell_checker.correction(title) != title and len(title) > 2:
                 corrected_title = spell_checker.correction(title)
                 CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
                 
                 return get_article_info(corrected_title)
             else:
+                CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
                 return article_info
 
     # attempt to determine article type and codex entry

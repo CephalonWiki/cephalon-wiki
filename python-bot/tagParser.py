@@ -37,7 +37,7 @@ def format_comment(comment_string):
     # do not search for tags in quoted comments
     comment_content = "\n\n".join(filter(lambda s: not(s.strip().startswith(">")), comment_paragraphs))
 
-    return comment_content.lower().title().replace("And", "and").strip()
+    return comment_content.lower().title().replace("And", "and").replace("Of","of").strip()
 
 
 # scan message, identify tags, and return a string containing all summaries
