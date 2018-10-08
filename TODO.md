@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+8.10.2018
+~~- Bot does not respond to comment that contains {Sands of Inaros}~~ 8.10.2018 - This was a real clusterfuck.  So the format_comment method from tagParser changed "Sands of Inaros" to "Sands Of Inaros" (thanks to python's title() string method).  The wiki does not recognize the title with a capital O for of, so the request was sent to the error correction clauses in get_article_info from warframeWikiScrapper.  BUT, because "Sands" contains the word "and", the bot replaced it with %26 (code for the ampersand, because that's what the wiki uses), and sent "S%26s Of Inaros" to the spell checker which would try and try and eventually give up after several minutes.  format_comment() and get_article_info() have been updated to address this.  The moral of the story?  String replacement is dangerous.
+
 6.10.2018
 - Need to setup better delimiters on log entries
 
