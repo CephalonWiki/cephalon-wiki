@@ -90,7 +90,7 @@ def get_article_info(title):
                 if not codex_entry.endswith("."):
                     codex_entry += "."
     except KeyError as e:
-        CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
+        CephalonWikiLogger.scrapper.error("KeyError: with " + str(e) + " for title " + title)
 
     # Assemble look up information into dictionary
     article_info["type"] = article_type

@@ -71,12 +71,12 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 self.logger.warning("No details retrieved for title %s", title)
                 return ""
         except Exception:
-            self.logger.warning("Retrieval for title %s failed.", title)
+            self.logger.error("Retrieval for title %s failed.", title)
             if detail:
                 self.logger.info("Trying to retrieve simple version of title %s.", title)
                 return self.format_article_summary(title)
             else:
-                self.logger.warning("No details retrieved for title %s", title)
+                self.logger.error("No details retrieved for title %s", title)
                 return ""
 
     def response(self, comment):

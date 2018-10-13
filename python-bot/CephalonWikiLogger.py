@@ -19,6 +19,10 @@ scrapper.setLevel(logging.DEBUG)
 spell_checker = logging.getLogger('spell_checker')
 spell_checker.setLevel(logging.DEBUG)
 
+# Logging specifically for spelling correction
+comparison = logging.getLogger('comparison')
+comparison.setLevel(logging.DEBUG)
+
 
 ############
 # handlers #
@@ -32,21 +36,20 @@ console.setLevel(logging.DEBUG)
 comment_log = logging.handlers.TimedRotatingFileHandler("../../logs/comments-log", 'midnight')
 comment_log.suffix = "%Y-%m-%d.txt"
 comment_log.setLevel(logging.INFO)
-comment_log.doRollover()
 
 # when not responding to a comment, will log a WARNING
 no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-log", 'midnight')
 no_response_log.suffix = "%Y-%m-%d.txt"
 no_response_log.setLevel(logging.WARNING)
 
-exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-log", 'midnight')
-exception_log.suffix = "%Y-%m-%d.txt"
-exception_log.setLevel(logging.ERROR)
-
 # will log spelling corrections as warnings
 spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-log", 'midnight')
 spell_checker_log.suffix = "%Y-%m-%d.txt"
 spell_checker_log.setLevel(logging.WARNING)
+
+exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-log", 'midnight')
+exception_log.suffix = "%Y-%m-%d.txt"
+exception_log.setLevel(logging.ERROR)
 
 
 ##############
@@ -58,16 +61,17 @@ log_formatter = logging.Formatter('%(asctime)s - %(name)s -  %(message)s')
 
 
 #############################
-# Add formatteres, handlers #
+# Add formatter, handlers #
 #############################
 
-# add formatters
+# add formatter
 console.setFormatter(console_formatter)
 
 comment_log.setFormatter(log_formatter)
 no_response_log.setFormatter(log_formatter)
 exception_log.setFormatter(log_formatter)
 spell_checker_log.setFormatter(log_formatter)
+
 
 # add handlers to loggers
 cephalon.addHandler(console)
@@ -80,3 +84,6 @@ scrapper.addHandler(exception_log)
 
 spell_checker.addHandler(console)
 spell_checker.addHandler(spell_checker_log)
+
+comparison.addHandler(console)
+comparison.addHandler(exception_log)
