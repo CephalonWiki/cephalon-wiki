@@ -2,13 +2,16 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
-8.10.2018
+13.10.2018
+- Failure to retrieve details for {Protective Dash}.  scrapper routes request to http://warframe.wikia.com/wiki/Focus/Vazarin#Protective_Dash but no details were retrieved.  Write general scrapper to search 1 level down from url location for info.
+
+~~8.10.2018~~
 ~~- Bot does not respond to comment that contains {Sands of Inaros}~~ 8.10.2018 - This was a real clusterfuck.  So the format_comment method from tagParser changed "Sands of Inaros" to "Sands Of Inaros" (thanks to python's title() string method).  The wiki does not recognize the title with a capital O for of, so the request was sent to the error correction clauses in get_article_info from warframeWikiScrapper.  BUT, because "Sands" contains the word "and", the bot replaced it with %26 (code for the ampersand, because that's what the wiki uses), and sent "S%26s Of Inaros" to the spell checker which would try and try and eventually give up after several minutes.  format_comment() and get_article_info() have been updated to address this.  The moral of the story?  String replacement is dangerous.
 
 6.10.2018
 - Need to setup better delimiters on log entries
 
-3.10.2018
+~~3.10.2018~~
 ~~- New log files are not being created; all logging is done into a file from September 30th.~~ Changed FileHandler to TimedRotatingFileHandler.  New log files should be formatted with the correct date
 
 27.9.2018
