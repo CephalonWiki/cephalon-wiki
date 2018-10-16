@@ -21,4 +21,5 @@ for submission in recent_posts:
     recovery_bot.logger.info("Gathering comments from submission \"" + submission.title + "\"")
 
 if comments:
+    recovery_bot.logger.info("Found the following comments:  %s", comments)
     recovery_bot.scan(comments)
