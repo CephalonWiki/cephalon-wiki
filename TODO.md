@@ -2,6 +2,12 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+23.10.2018
+- Raspberry Pi has been freezing and exception log has been filling up with the following:  
+
+2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))
+- Start and Recovery scripts not working on reboot?  Investigate file-paths
+
 13.10.2018
 
 - Failure to retrieve details for {Protective Dash}.  scrapper routes request to http://warframe.wikia.com/wiki/Focus/Vazarin#Protective_Dash but no details were retrieved.  Write general scrapper to search 1 level down from url location for info.
