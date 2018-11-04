@@ -107,5 +107,5 @@ class RedditBot:
 
             # take a nap and start again
             self.logger.debug("Napping...")
-            time.sleep(60)
+            time.sleep(120)
             self.scan(stream)
