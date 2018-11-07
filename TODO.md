@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+6.11.2018
+- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.
+
 23.10.2018
 - Raspberry Pi has been freezing and exception log has been filling up with the following:  
 
