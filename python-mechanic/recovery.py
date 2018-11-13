@@ -3,7 +3,7 @@ sys.path.append('../python-bot')
 
 import RedditBotCephalonWiki
 
-recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki("Recovery Bot")
+recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "recovery-cephalon-wiki")
 
 # deprecated :(
 # get posts from last 36 hours
@@ -21,3 +21,5 @@ for submission in recent_posts:
 
 if comments:
     recovery_bot.scan(comments)
+else:
+    recovery_bot.logger.warning("No comments found.  Terminating.")
