@@ -84,29 +84,13 @@ no_response_log.setFormatter(formatter)
 exception_log.setFormatter(formatter)
 spell_checker_log.setFormatter(formatter)
 
-<<<<<<< HEAD
-#############################
-# Add formatter, handlers #
-#############################
-
-# add formatter
-console.setFormatter(console_formatter)
-=======
-
 ###########################
 # Add handlers to loggers #
 ###########################
->>>>>>> dev
 
 # all events are handled by the console
 
 # bot will log to every file/handler
-
-<<<<<<< HEAD
-
-# add handlers to loggers
-=======
->>>>>>> dev
 cephalon.addHandler(console)
 cephalon.addHandler(comment_log)
 cephalon.addHandler(no_response_log)
@@ -120,14 +104,10 @@ spell_checker.addHandler(spell_checker_log)
 scrapper.addHandler(console)
 scrapper.addHandler(exception_log)
 
-<<<<<<< HEAD
-spell_checker.addHandler(console)
-spell_checker.addHandler(spell_checker_log)
-
-comparison.addHandler(console)
-comparison.addHandler(exception_log)
-=======
 # comparison will only log exceptions, as with scrapper
 comparison.addHandler(console)
 comparison.addHandler(exception_log)
->>>>>>> dev
+
+spell_checker.addHandler(console)
+spell_checker.addHandler(spell_checker_log)
+

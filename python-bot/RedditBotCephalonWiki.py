@@ -20,16 +20,6 @@ footer = "\n\n*****\n\nBot by /u/1st_transit_of_venus | " \
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
-<<<<<<< HEAD
-    def __init__(self, name = "Cephalon Wiki"):
-        super().__init__(reddit_instance)
-        super().set_subreddit("warframe")
-        super().set_mechanic("1st_transit_of_venus")
-        super().set_header(header)
-        super().set_footer(footer)
-        super().set_name(name)
-        super().set_logger(CephalonWikiLogger.cephalon)
-=======
     def __init__(self, name="cephalon-wiki", subreddit="warframe"):
 
         super().set_name(name)
@@ -50,7 +40,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_header(header)
         super().set_footer(footer)
 
->>>>>>> dev
 
     def should_respond(self, comment):
         if ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0):
@@ -90,10 +79,8 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 return ""
         except Exception:
             self.logger.error("Retrieval for title %s failed.", title)
-<<<<<<< HEAD
-=======
             self.logger.error(traceback.format_exc())
->>>>>>> dev
+
             if detail:
                 self.logger.warning("Trying to retrieve simple version of title %s.", title)
                 return self.format_article_summary(title)
