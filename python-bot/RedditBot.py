@@ -99,13 +99,19 @@ class RedditBot:
 
         except KeyboardInterrupt:
             self.logger.debug("Interrupting...")
+            self.logger.error(traceback.format_exc())
 
         except Exception as e:
             error_msg = "Exception raised:  " + str(e)
 
             self.logger.error(error_msg)
+            self.logger.error(traceback.format_exc())
 
             # take a nap and start again
             self.logger.debug("Napping...")
+<<<<<<< HEAD
             time.sleep(120)
+=======
+            time.sleep(300)
+>>>>>>> dev
             self.scan(stream)
