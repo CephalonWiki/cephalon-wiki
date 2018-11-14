@@ -11,28 +11,28 @@ import tagParser
 import warframeWikiScrapper
 import warframeWikiItemComparer
 
+import random
 
 # For responding to comments
 header = "Hello Tenno.  Here is the information you requested.\n"
-footer = "\n\n*****\n\nBot by /u/1st_transit_of_venus | " \
-         "Code available on [github](https://github.com/CephalonWiki/cephalon-wiki)"
+footer = "\n\n*****\n\nCode available on [github](https://github.com/CephalonWiki/cephalon-wiki) | Bot by /u/1st_transit_of_venus"
 
-# create Reddit instance
-with open("../../data/credentials.txt", 'r') as login_credentials:
-    credentials = login_credentials.readline().split(',')
-    reddit_instance = praw.Reddit(client_id=credentials[0], client_secret=credentials[1],
-                                  user_agent=credentials[2] + ":%s".format(name), username=credentials[3], password=credentials[4])
 
-         
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
     def __init__(self, name="cephalon-wiki", subreddit="warframe"):
 
+        # create Reddit instance
+        with open("../../data/credentials.txt", 'r') as login_credentials:
+            credentials = login_credentials.readline().split(',')
+            reddit_instance = praw.Reddit(client_id=credentials[0], client_secret=credentials[1],
+                                          user_agent=credentials[2] + ":%s".format(random.random()),
+                                          username=credentials[3], password=credentials[4])
+            super().__init__(reddit_instance)
+
         super().set_name(name)
         super().set_logger(CephalonWikiLogger.cephalon)
         self.logger.name = name
-
-        super().__init__(reddit_instance)
 
         super().set_subreddit(subreddit)
         super().set_mechanic("1st_transit_of_venus")
