@@ -17,7 +17,7 @@ comments = []
 for submission in recent_posts:
     submission.comments.replace_more(limit=0)
     comments += list(filter(recovery_bot.should_respond, submission.comments.list()))
-    recovery_bot.console_log("Gathering comments from submission \"" + submission.title + "\"")
+    recovery_bot.logger.info("Gathering comments from submission \"" + submission.title + "\"")
 
 if comments:
     recovery_bot.scan(comments)

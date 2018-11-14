@@ -36,7 +36,6 @@ console.setLevel(logging.DEBUG)
 comment_log = logging.handlers.TimedRotatingFileHandler("../../logs/comments-log", 'midnight')
 comment_log.suffix = "%Y-%m-%d.txt"
 comment_log.setLevel(logging.INFO)
-comment_log.doRollover()
 
 # when not responding to a comment, will log a WARNING
 no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-log", 'midnight')
