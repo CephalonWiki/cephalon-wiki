@@ -2,18 +2,31 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+16.11.2018
+- The bot uses a now out-of-date article list that needs to be updated.
+- Current list of articles for which retrieval fails:
+  - Excalibur Umbra:  Generalize treatment of Warframe names
+  - Io:  No such article exists
+  - Fire Prosecutor:  No such article exists
+  - Adaptation:  Update article list for us in spell chcker
+  - Lambeo Moa
+  - Due to Redirects:  Requires new feature.  Can generalize code used to retrieve an article summary
+    - Protective Dash: Vazarin#Protective_Dash
+    - Arid Eviscertar:  Eviscerator#Variants
+   
+
 6.11.2018
-- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.
+~~- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.~~ 11.16.18 - Rolled up into list of articles
 
 23.10.2018
-- Raspberry Pi has been freezing and exception log has been filling up with the following:  
+~~- Raspberry Pi has been freezing and exception log has been filling up with the following:  ~~
 
-2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))
-- Start and Recovery scripts not working on reboot?  Investigate file-paths
+~~2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))~~ 16.11.18 Changed reddit API configuration to create unique user agents for each instance of the bot. Increased sleep time to 5 minutes.
+~~- Start and Recovery scripts not working on reboot?  Investigate file-paths~~ 16.11.18 - Updated file paths used in scripts.
 
 13.10.2018
 
-- Failure to retrieve details for {Protective Dash}.  scrapper routes request to http://warframe.wikia.com/wiki/Focus/Vazarin#Protective_Dash but no details were retrieved.  Write general scrapper to search 1 level down from url location for info.
+~~- Failure to retrieve details for {Protective Dash}.  scrapper routes request to http://warframe.wikia.com/wiki/Focus/Vazarin#Protective_Dash but no details were retrieved.  Write general scrapper to search 1 level down from url location for info.~~ - 11.16.18 Rolled up into list of articles
 
 
 ~~8.10.2018~~
@@ -33,7 +46,7 @@ Will be updated with ongoing goals, tasks, updates, etc.
 27.9.2018
 
 ~~The spell checker failed to correct "dna stabilizers" to "DNA Stabilizer".  Need to add some .lower() to the comparisons.~~ Added a dictionary to spell_checkery.py, and check spelling but not case.
-- Exceptions are logged into no-response log.  Check description in CephalonWikiLog.py
+~~- Exceptions are logged into no-response log.  Check description in CephalonWikiLog.py~~ 16.11.18 - Updated logger to filter messages
 ~~Articles not found:  Isolator Bursa~~ - Not replicated.  Currently works like a charm.
 - Write a script to pull the current list of article_names (used in all_articles.py -> spell_checker.py) periodically.  Could save some API calls in warframeWikiScrapper
 
