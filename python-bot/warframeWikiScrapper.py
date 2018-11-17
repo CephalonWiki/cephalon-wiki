@@ -137,59 +137,17 @@ def get_article_summary(title, detail=False):
         #
         # find general article summary
         #
-        article_summary = article_info["codex"]
+        article_summary = ""
         if not article_summary or len(article_summary) > 400 or title not in article_summary:
             for p in article_tree.findall('.//*[@id="mw-content-text"]/p'):
-                article_summary = p.text_content().strip().replace("\xa0", " ").replace("  ", " ")
-                #print(article_summary)
+                if article_info["title"] in p.text_content():
 
-                if article_summary and article_info["title"] in article_summary:
-                    image_alt_texts = list(map(lambda tag: tag.get("alt").strip(), p.findall('./a/img')))
-                    summary_polarities = list(map(lambda s: s.replace(" Pol", ""),
-                                                  filter(lambda s: "Pol" in s, image_alt_texts)))
-                    other_alts = list(filter(lambda s: "Pol" not in s, image_alt_texts))
-                    #print(image_alt_texts, summary_polarities, other_alts)
+                    # Set the text of all the /a/img objects (e.g. Polarities, Currency)
+                    for i in p.findall('./a/img'):
+                        i.text = i.get('alt').replace(' Pol', '')
 
-                    if summary_polarities:
-                        article_summary_split = article_summary.split("  ")
-                        #print(article_summary_split)
-                        article_summary = ""
-                        for i in range(len(summary_polarities)):
-                            article_summary += " ".join([article_summary_split[i], summary_polarities[i], ""])
-                        article_summary += article_summary_split[-1].strip()
-
-                    if "ReputationBlackx64" in other_alts:
-
-                        article_summary_split = article_summary.split("\u200d")
-
-                        article_summary = ""
-                        for i in range(len(article_summary_split)):
-                            if i == 0:
-                                article_summary += article_summary_split[i]
-                            else:
-                                words = article_summary_split[i].split()
-                                if words[0].endswith("."):
-                                    words.insert(1, " Reputation.")
-                                else:
-                                    words.insert(1, " Reputation")
-                                article_summary += " ".join(words[1:])
-                    elif "Platinum64" in other_alts:
-
-                        article_summary_split = article_summary.split("\u200d")
-
-                        article_summary = ""
-                        for i in range(len(article_summary_split)):
-                            if i == 0:
-                                article_summary += article_summary_split[i]
-                            else:
-                                words = article_summary_split[i].split()
-                                if words[0].endswith("."):
-                                    words.insert(1, "Platinum.")
-                                else:
-                                    words.insert(1, "Platinum")
-                                article_summary += " ".join(words)
-
-
+                    article_summary = p.text_content().strip().replace("\xa0", " ")
+                    CephalonWikiLogger.scrapper.debug(article_summary)
                     break
 
             # if we do not find an article summary from p tags, take first text paragraph
@@ -266,40 +224,28 @@ def get_article_summary(title, detail=False):
                     if div_title not in aside_filter:
                         continue
 
-                    div_text = div.text_content().strip()[len(div_title):].strip()
-                    div_info = ""
+                    # Replace images with their alt text
+                    for tag in div.findall('.//a/img'):
+                        if "Pol" in tag.get('alt'):
+                            tag.text = tag.get('alt').replace('Pol', '')
+                        elif " b" in tag.get('alt'):
+                            tag.text = tag.get('alt').replace(' b', '')
+
+                    div_info = div.text_content().strip()[len(div_title):].strip()
 
                     if "Polarit" in div_title:
-                        if "None" in div_text:
+                        if "None" in div_info:
                             div_info = "None"
                             aside_info.append(div_title + "|" + div_info)
                             continue
 
-                        polarity_list = list(map(lambda tag: tag.get("alt").replace(" Pol", ""),
-                                                 div.findall('./div//a/img')))
-                        polarity_mults = div_text.strip().split()
-                        if not polarity_mults:
-                            polarity_mults = [""] * len(polarity_list)
-
-                        for i in range(len(polarity_list)):
-                            if polarity_mults[i] != "":
-                                div_info += polarity_list[i] + " " + polarity_mults[i] + ", "
-                            else:
-                                div_info += polarity_list[i] + ", "
-                        div_info = div_info[:-2]
                     elif "Total Damage" == div_title:
                         div_title = current_subheader.text_content().strip()
-                        damage_type = div.findall('./div//a/img')[0].get("alt").replace(" b", "")
-                        if "(" in div_text:
-                            div_info = div_text.replace("(", "(" + damage_type)
-                        else:
-                            div_info = damage_type + " " + div_text
+
                     elif div_title in ["Exclusive Mods", "Variants"]:
                         div_links = list(map(lambda a: a.text_content(),
                                              div.findall("./div//a")))
                         div_info = ", ".join(div_links)
-                    else:
-                        div_info = div_text
 
                     aside_titles.append(div_title.strip())
                     aside_line.append(":----------:")
@@ -318,25 +264,26 @@ def get_article_summary(title, detail=False):
 
         # Warframes and Archwings
         if article_info["type"] in ["Warframe", "Archwing"]:
-
-            # find and process abilities
-            ability_tags = get_article_info(article_info["title"].replace(" Prime", "") + "/Abilities")["tags"]
-            ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
-            ability_summaries = list(map(get_article_summary, ability_list))
-            # ability_summaries_fm = list(map(lambda l: l[0][3:] + " (" + l[2].split()[-1] + ")" + ":  " + l[1].strip(), ability_summaries))
-            # + " (" + l[2].split()[-1] + ")"
-            ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
-
-            # find acquisition info for non-primes
-            acquisition_summary = ''
-            if "Prime" not in article_info["title"]:
-                for p in article_tree.findall('.//*[@id="mw-content-text"]/div/div/div/p'):
-                    acquisition_info = p.text_content().strip()
-                    if "component" in acquisition_info.lower() and "blueprint" in acquisition_info.lower():
-                        acquisition_summary = acquisition_info.split(". ")[0] + "."
-                        break
-
             if detail:
+                # find and process abilities for non-Umbras
+                ability_summaries_fm = ""
+                if "Umbra" not in article_info["title"]:
+                    ability_tags = get_article_info(article_info["title"].replace(" Prime", "") + "/Abilities")["tags"]
+                    ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
+                    ability_summaries = list(map(get_article_summary, ability_list))
+                    # ability_summaries_fm = list(map(lambda l: l[0][3:] + " (" + l[2].split()[-1] + ")" + ":  " + l[1].strip(), ability_summaries))
+                    # + " (" + l[2].split()[-1] + ")"
+                    ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
+
+                # find acquisition info for non-primes
+                acquisition_summary = ''
+                if "Prime" not in article_info["title"]:
+                    for p in article_tree.findall('.//*[@id="mw-content-text"]/div/div/div/p'):
+                        acquisition_info = p.text_content().strip()
+                        if "component" in acquisition_info.lower() and "blueprint" in acquisition_info.lower():
+                            acquisition_summary = acquisition_info.split(". ")[0] + "."
+                            break
+
                 return [url_fm, article_summary, ability_summaries_fm, aside_table, acquisition_summary]
             else:
                 return [url_fm, article_summary]
@@ -380,6 +327,32 @@ def get_article_summary(title, detail=False):
                 mod_stats_string = "\n".join(mod_stats_strings)
 
             return [url_fm, mod_summary + format_polarity(mod_polarity), mod_stats_string]
+        elif article_info["type"] == "Component" and "Arcane" in article_info["title"]:
+
+            if not detail:
+                return [url_fm, article_summary]
+
+            arcane_stats_tables = article_tree.findall('.//*[@class="emodtable"]')
+            arcane_stats_string = ""
+
+            if len(arcane_stats_tables) > 0:
+                arcane_stats_table = arcane_stats_tables[0]
+                arcane_rows = arcane_stats_table.getchildren()
+                arcane_no_columns = len(arcane_rows[0].getchildren())
+
+                arcane_stats_strings = []
+                for i in [0, .5, 1, -1]:
+                    if i == .5:
+                        arcane_row_string = (":---------:|" * arcane_no_columns)[:-1]
+                    else:
+                        arcane_row = arcane_rows[i].getchildren()
+                        arcane_row_string = "|".join([s.text_content().strip() for s in arcane_row])
+
+                    arcane_stats_strings.append(arcane_row_string)
+
+                arcane_stats_string = "\n".join(arcane_stats_strings)
+
+            return [url_fm, article_summary, arcane_stats_string]
 
         elif article_info["type"] == "Quest":
             spoiler_summary = "[Spoiler:](#s '" + article_summary + "')"
