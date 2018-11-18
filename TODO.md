@@ -5,7 +5,7 @@ Will be updated with ongoing goals, tasks, updates, etc.
 16.11.2018
 - The bot uses a now out-of-date article list that needs to be updated.
 - Current list of articles for which retrieval fails:
-  - Excalibur Umbra:  Generalize treatment of Warframe names
+  ~~- Excalibur Umbra:  Generalize treatment of Warframe names~~ Covered through overhaul of image-to-text replacement
   - Io:  No such article exists
   - Fire Prosecutor:  No such article exists
   - Adaptation:  Update article list for us in spell chcker
