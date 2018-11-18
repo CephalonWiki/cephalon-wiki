@@ -190,7 +190,8 @@ def get_article_summary(title, detail=False):
                              "Kubrow": comp_filters,
                              "Kavat": comp_filters,
                              "ModBox": mod_filters,
-                             "Quest": []}
+                             "Quest": [],
+                             "Component": []}
             aside_filter = []
             try:
                 aside_filter = aside_filters[article_info["type"]]
@@ -203,14 +204,7 @@ def get_article_summary(title, detail=False):
                 if t.tag == "h2":
                     current_subheader = t
                     continue
-                    # if t.text_content().strip() in ["Statistics", "Utility", "Other", "Miscellaneous"]:
-                    #     continue
-                    # elif "Attacks" in t.text_content():
-                    #     continue
-                    # else:
-                    #     aside_titles.append(t.text_content().strip())
-                    #     aside_line.append("----------:")
-                    #     aside_info.append(" ")
+
                 elif t.tag == "div":
                     div = t
                     div_headers = div.findall('./h3')
@@ -271,8 +265,6 @@ def get_article_summary(title, detail=False):
                     ability_tags = get_article_info(article_info["title"].replace(" Prime", "") + "/Abilities")["tags"]
                     ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
                     ability_summaries = list(map(get_article_summary, ability_list))
-                    # ability_summaries_fm = list(map(lambda l: l[0][3:] + " (" + l[2].split()[-1] + ")" + ":  " + l[1].strip(), ability_summaries))
-                    # + " (" + l[2].split()[-1] + ")"
                     ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
 
                 # find acquisition info for non-primes
@@ -297,62 +289,40 @@ def get_article_summary(title, detail=False):
 
             return [url_fm, ability_summary, energy_cost]
 
-        # MODS
-        elif article_info["type"] == "ModBox":
-            mod_summary = article_summary
-
-            if not detail:
-                return [url_fm, mod_summary]
-
-            mod_polarity = aside_info[-1]
-
-            mod_stats_tables = article_tree.findall('.//*[@class="emodtable"]')
-            mod_stats_string = ""
-
-            if len(mod_stats_tables) > 0:
-                mod_stats_table = mod_stats_tables[0]
-                mod_rows = mod_stats_table.getchildren()
-                mod_no_columns = len(mod_rows[0].getchildren())
-
-                mod_stats_strings = []
-                for i in [0, .5, 1, -1]:
-                    if i == .5:
-                        mod_row_string = (":---------:|" * mod_no_columns)[:-1]
-                    else:
-                        mod_row = mod_rows[i].getchildren()
-                        mod_row_string = "|".join([s.text_content().strip() for s in mod_row])
-
-                    mod_stats_strings.append(mod_row_string)
-
-                mod_stats_string = "\n".join(mod_stats_strings)
-
-            return [url_fm, mod_summary + format_polarity(mod_polarity), mod_stats_string]
-        elif article_info["type"] == "Component" and "Arcane" in article_info["title"]:
+        # Mods and Arcanes
+        elif article_info["type"] == "Component" and "Arcane" in article_info["title"] or article_info["type"] == "ModBox":
 
             if not detail:
                 return [url_fm, article_summary]
 
-            arcane_stats_tables = article_tree.findall('.//*[@class="emodtable"]')
-            arcane_stats_string = ""
+            # Gather data from table
+            stats_tables = article_tree.findall('.//*[@class="emodtable"]')
+            stats_string = ""
 
-            if len(arcane_stats_tables) > 0:
-                arcane_stats_table = arcane_stats_tables[0]
-                arcane_rows = arcane_stats_table.getchildren()
-                arcane_no_columns = len(arcane_rows[0].getchildren())
+            if len(stats_tables) > 0:
+                stats_table = stats_tables[0]
+                rows = stats_table.getchildren()
+                no_columns = len(rows[0].getchildren())
 
-                arcane_stats_strings = []
+                stats_strings = []
                 for i in [0, .5, 1, -1]:
                     if i == .5:
-                        arcane_row_string = (":---------:|" * arcane_no_columns)[:-1]
+                        row_string = (":---------:|" * no_columns)[:-1]
                     else:
-                        arcane_row = arcane_rows[i].getchildren()
-                        arcane_row_string = "|".join([s.text_content().strip() for s in arcane_row])
+                        row = rows[i].getchildren()
+                        row_string = "|".join([s.text_content().strip() for s in row])
 
-                    arcane_stats_strings.append(arcane_row_string)
+                    stats_strings.append(row_string)
 
-                arcane_stats_string = "\n".join(arcane_stats_strings)
+                stats_string = "\n".join(stats_strings)
 
-            return [url_fm, article_summary, arcane_stats_string]
+            # package and return
+            if "Arcane" in article_info["title"]:
+                return [url_fm, article_summary, stats_string]
+            else:
+                mod_polarity = aside_info[-1]
+                mod_summary = article_summary + format_polarity(mod_polarity)
+                return [url_fm, mod_summary, stats_string]
 
         elif article_info["type"] == "Quest":
             spoiler_summary = "[Spoiler:](#s '" + article_summary + "')"
