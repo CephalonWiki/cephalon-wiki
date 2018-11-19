@@ -20,7 +20,10 @@ def correction(word):
 
     # if we actually make a correction, return word with proper capitalization using the case_dict
     if suggested_correction != word:
-        return case_dict[suggested_correction]
+        if suggested_correction in case_dict:
+            return case_dict[suggested_correction]
+        else:
+            return suggested_correction.title()
     else:
         return suggested_correction
 

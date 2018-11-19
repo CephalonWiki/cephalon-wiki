@@ -1,7 +1,5 @@
 import logging
 from logging import handlers
-import datetime
-
 
 ###########
 # loggers #
