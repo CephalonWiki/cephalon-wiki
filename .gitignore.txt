@@ -1,2 +1,0 @@
-python-bot\__pycache__\*
-python-mechanic\__pycache__\*
