@@ -18,14 +18,18 @@ Will be updated with ongoing goals, tasks, updates, etc.
 
 6.11.2018
 
-~~- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.~~ 11.16.18 - Rolled up into list of articles
+11.16.18 - Rolled up into list of articles
+~~- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.~~ 
 
 23.10.2018
 
+16.11.18 Changed reddit API configuration to create unique user agents for each instance of the bot. Increased sleep time to 5 minutes.
 ~~-  Raspberry Pi has been freezing and exception log has been filling up with the following~~
 
-~~2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))~~ 16.11.18 Changed reddit API configuration to create unique user agents for each instance of the bot. Increased sleep time to 5 minutes.
-~~- Start and Recovery scripts not working on reboot?  Investigate file-paths~~ 16.11.18 - Updated file paths used in scripts.
+~~2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))~~ 
+
+16.11.18 - Updated file paths used in scripts.
+~~- Start and Recovery scripts not working on reboot?  Investigate file-paths~~ 
 
 13.10.2018
 
