@@ -18,7 +18,7 @@ Will be updated with ongoing goals, tasks, updates, etc.
 
 6.11.2018
 
-11.16.18 - Rolled up into list of articles
+16.11.18 - Rolled up into list of articles
 ~~- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.~~ 
 
 23.10.2018
