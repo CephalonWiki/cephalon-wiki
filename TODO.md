@@ -3,6 +3,7 @@
 Will be updated with ongoing goals, tasks, updates, etc.
 
 16.11.2018
+
 - The bot uses a now out-of-date article list that needs to be updated.
 - Current list of articles for which retrieval fails:
   ~~- Excalibur Umbra:  Generalize treatment of Warframe names~~ Covered through overhaul of image-to-text replacement
@@ -16,9 +17,11 @@ Will be updated with ongoing goals, tasks, updates, etc.
    
 
 6.11.2018
+
 ~~- Retrieval for {Excalibur Umbra} failed.  Should redirect to Excalibur/Umbra.  Check details in scrapper.~~ 11.16.18 - Rolled up into list of articles
 
 23.10.2018
+
 ~~ - Raspberry Pi has been freezing and exception log has been filling up with the following:  ~~
 
 ~~2018-10-23 00:00:28,792 - cephalon -  Exception raised:  error with request HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /api/v1/access_token (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0xb54e42d0>: Failed to establish a new connection: [Errno -2] Name or service not known',))~~ 16.11.18 Changed reddit API configuration to create unique user agents for each instance of the bot. Increased sleep time to 5 minutes.
@@ -35,6 +38,7 @@ Will be updated with ongoing goals, tasks, updates, etc.
 
 
 6.10.2018
+
 - Need to setup better delimiters on log entries
 
 
