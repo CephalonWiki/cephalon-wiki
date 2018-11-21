@@ -138,28 +138,26 @@ def get_article_summary(title, detail=False):
         # find general article summary
         #
         article_summary = ""
-        if not article_summary or len(article_summary) > 400 or title not in article_summary:
-            for p in article_tree.findall('.//*[@id="mw-content-text"]/p'):
-                if article_info["title"] in p.text_content():
+        for p in article_tree.findall('.//*[@id="mw-content-text"]/p'):
+            if article_info["title"] in p.text_content() and '×' not in p.text_content():
 
-                    # Set the text of all the /a/img objects (e.g. Polarities, Currency)
-                    for i in p.findall('./a/img'):
-                        i.text = i.get('alt').replace(' Pol', '')
+                # Set the text of all the /a/img objects (e.g. Polarities, Currency)
+                for i in p.findall('./a/img'):
+                    i.text = i.get('alt').replace(' Pol', '')
 
-                    article_summary = p.text_content().strip().replace("\xa0", " ")
-                    CephalonWikiLogger.scrapper.debug(article_summary)
-                    break
+                article_summary = p.text_content().strip().replace("\xa0", " ")
+                CephalonWikiLogger.scrapper.debug(article_summary)
+                break
 
-            # if we do not find an article summary from p tags, take first text paragraph
-            if not (article_summary and article_info["title"] in article_summary):
-                try:
-                    paragraph = filter(lambda s: title in s and title != s,
-                                       article_tree.find('.//*[@id="mw-content-text"]').text_content().split(
-                                           "\n")).__next__()
-                    article_summary = paragraph.strip().replace("\xa0", "")
-                except Exception:
-                    article_summary = "Sorry, no summary is availablebleblebleble... Hmm... I will attempt to bypass this fault."
-                    CephalonWikiLogger.scrapper.error("No summary available for %s", article_info["title"])
+        # if we do not find an article summary from p tags, take first text paragraph
+        if article_info["title"] not in article_summary:
+            try:
+                paragraph = filter(lambda s: title in s and title != s and '×' not in s,
+                                   article_tree.find('.//*[@id="mw-content-text"]').text_content().split("\n")).__next__()
+                article_summary = paragraph.strip().replace("\xa0", "")
+            except Exception:
+                article_summary = "Sorry, no summary is availablebleblebleble... Hmm... I will attempt to bypass this fault."
+                CephalonWikiLogger.scrapper.error("No summary available for %s", article_info["title"])
 
         #
         # processing for the aside
