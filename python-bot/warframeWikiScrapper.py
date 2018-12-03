@@ -1,11 +1,10 @@
 import itertools
-import datetime
 
 import requests
-
 import json
 from lxml import html
 
+from articles_list import articles_dict as articles
 import spell_checker
 
 import tagParser
@@ -13,93 +12,7 @@ import tagParser
 import CephalonWikiLogger
 
 
-# Given an article title, searches for article on wiki
-def get_article_info(title):
-    CephalonWikiLogger.scrapper.info("Searching for info on %s.", title)
-
-    # access article json and convert to a dictionary
-    article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + title.replace(" ", "_")
-                                + "&prop=revisions&rvprop=content&format=json")
-    article_dict = json.loads(article_json.content.decode('utf-8'))['query']['pages']
-
-    # dictionary to populate and return
-    article_info = dict()
-
-    # extract article id for look-up and error checking
-    article_info["id"] = list(article_dict.keys())[0]
-
-    # positive id means article found
-    if int(article_info["id"]) > 0:
-        article_info["title"] = title.replace("%26", "&").replace("/", " ").replace(" Main", "").strip()
-        article_info["url"] = "http://warframe.wikia.com/wiki/" + title.replace(" ", "_").replace("/Main", "")
-    else:
-        # If article is not found on first run, alter title and look up again, otherwise try search suggestions
-        if "&" in title:
-            return get_article_info(title.replace("&", "%26"))
-        elif " and " in title:
-            return get_article_info(title.replace(" and ", " %26 "))
-        else:
-            CephalonWikiLogger.scrapper.warning("Article info not found for %s.  Checking spelling.", title)
-
-            # Use search suggestions to correct query, otherwise return blank dict
-            suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query="
-                                            + title.replace(" ", "_"))
-            suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
-
-            if suggestions_dict:
-                corrected_title = suggestions_dict[0]["title"]
-                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
-
-                return get_article_info(corrected_title)
-            if spell_checker.correction(title) != title and len(title) > 2:
-                corrected_title = spell_checker.correction(title)
-                CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
-                
-                return get_article_info(corrected_title)
-            else:
-                CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
-                return article_info
-
-    # attempt to determine article type and codex entry
-    article_type = ""
-    codex_entry = ""
-    article_tags = {}
-    try:
-        # article_dump contains codex entry and useful tags for classification of article type
-        article_dump = article_dict[article_info["id"]]["revisions"][0]['*'].strip()
-        if article_dump.lower().startswith("#redirect"):
-            return get_article_info(article_dump[article_dump.index("[[") + 2:article_dump.index("]]")])
-        else:
-            article_tags = tagParser.get_tags(article_dump, "{{", "}}")
-
-        # Determining type and codex
-        for i in sorted(article_tags):
-            t = article_tags[i]
-            if t == ":" + title + "/Main":
-                # redirect for Warframes and Archwings
-                return get_article_info(t[1:])
-            elif "\n| name" in t:
-                article_type = t[:t.find("\n| name")].strip()
-            elif "ModBox" in t:
-                article_type = "ModBox"
-            elif t == "WeaponNav":
-                #  or "|Weapons" in t or
-                article_type = "Weapon"
-            elif t.lower().startswith("codex|"):
-                codex_entry = t.split("|")[1].strip()
-                if not codex_entry.endswith("."):
-                    codex_entry += "."
-    except KeyError as e:
-        CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
-
-    # Assemble look up information into dictionary
-    article_info["type"] = article_type
-    article_info["codex"] = codex_entry
-    article_info["tags"] = article_tags
-
-    return article_info
-
-
+# Helper function for mapping polarity names to a letter
 def format_polarity(mod_polarity):
     polarity_letter = ""
     if mod_polarity == "Madurai":
@@ -115,23 +28,80 @@ def format_polarity(mod_polarity):
     elif mod_polarity == "Penjaga":
         polarity_letter = "Y"
 
-    return "  Polarity:  " + mod_polarity + " (" + polarity_letter + ").  "
+    return "Polarity:  " + mod_polarity + " (" + polarity_letter + ")."
 
 
-def get_article_summary(title, detail=False):
+# Given an article title, searches for article on wiki
+def get_article_info(title):
+    CephalonWikiLogger.scrapper.info("Searching for info on %s.", title)
+
+    # dictionary to populate and return
+    article_info = {'id':-1, 'title':''}
+
+    # positive id means article found
+    if title.lower() in articles:
+        article_info = articles[title.lower()]
+
+        # access article json and convert to a dictionary
+        article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + article_info['url'].replace('/wiki/','') + "&prop=revisions&rvprop=content&format=json")
+        article_dict = json.loads(article_json.content.decode('utf-8'))['query']['pages']
+
+        # attempt to determine article type
+        article_type = ""
+        article_tags = {}
+        try:
+            # article_dump contains codex entry and useful tags for classification of article type
+            article_dump = article_dict[str(article_info["id"])]["revisions"][0]['*'].strip()
+            if article_dump.lower().startswith("#redirect"):
+                return get_article_info(article_dump[article_dump.index("[[") + 2:article_dump.index("]]")])
+            else:
+                article_tags = tagParser.get_tags(article_dump, "{{", "}}")
+
+                # Determining type
+                for i in sorted(article_tags):
+                    t = article_tags[i]
+                    if t == ":" + article_info['title'] + "/Main":
+                        #redirect for Warframes and Archwings
+                        article_type = "Warframe or Archwing"
+                    elif "\n| name" in t:
+                        article_type = t[:t.find("\n| name")].strip()
+                    elif "ModBox" in t:
+                        article_type = "ModBox"
+                    elif t == "WeaponNav":
+                        #  or "|Weapons" in t or
+                        article_type = "Weapon"
+        except KeyError as e:
+            CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
+
+        # Assemble look up information into dictionary
+        article_info["type"] = article_type
+        article_info["tags"] = article_tags
+        article_info["title"] = article_info["title"].replace("/", " ")
+
+        return article_info
+    else:
+        CephalonWikiLogger.scrapper.warning("Article info not found for %s.  Checking spelling.", title)
+
+        if spell_checker.correction(title) != title and len(title) > 2:
+            corrected_title = spell_checker.correction(title)
+            CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
+
+            return get_article_info(corrected_title)
+        else:
+            CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
+            return article_info
+
+
+def get_article_summary(title, detail=True):
     article_info = get_article_info(title)
 
-    if int(article_info["id"]) > 0:
+    if article_info["id"] > 0:
 
         # formatting for reddit comment
-        url_fm = "###[" + article_info["title"] + "](" + article_info["url"] + ")"
-
-        # If we don't need the detail, don't bother looking it up
-        if not detail and article_info["codex"] and article_info["type"] not in ["Warframe", "Archwing"]:
-                return [url_fm, article_info["codex"]]
+        url_fm = "###[" + article_info["title"] + "](https://warframe.fandom.com" + article_info["url"] + ")"
 
         # main processing
-        article_main = requests.get(article_info["url"])
+        article_main = requests.get("https://warframe.fandom.com" + article_info["url"])
         article_tree = html.fromstring(article_main.content)
 
         #
@@ -182,8 +152,8 @@ def get_article_summary(title, detail=False):
             mod_filters = ["Polarity"]
             aside_filters = {"": [],
                              "Weapon": weapon_filters,
+                             "Warframe or Archwing": warframe_filters,
                              "Warframe": warframe_filters,
-                             "Archwing": warframe_filters,
                              "Sentinel": comp_filters,
                              "Kubrow": comp_filters,
                              "Kavat": comp_filters,
@@ -255,28 +225,25 @@ def get_article_summary(title, detail=False):
         #
 
         # Warframes and Archwings
-        if article_info["type"] in ["Warframe", "Archwing"]:
-            if detail:
-                # find and process abilities for non-Umbras
-                ability_summaries_fm = ""
-                if "Umbra" not in article_info["title"]:
-                    ability_tags = get_article_info(article_info["title"].replace(" Prime", "") + "/Abilities")["tags"]
-                    ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
-                    ability_summaries = list(map(get_article_summary, ability_list))
-                    ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
+        if article_info["type"] in ["Warframe or Archwing", 'Warframe']:
+            # find and process abilities
+            ability_summaries_fm = ""
 
-                # find acquisition info for non-primes
-                acquisition_summary = ''
-                if "Prime" not in article_info["title"]:
-                    for p in article_tree.findall('.//*[@id="mw-content-text"]/div/div/div/p'):
-                        acquisition_info = p.text_content().strip()
-                        if "component" in acquisition_info.lower() and "blueprint" in acquisition_info.lower():
-                            acquisition_summary = acquisition_info.split(". ")[0] + "."
-                            break
+            ability_tags = get_article_info(article_info["title"].replace(" Umbra", "").replace(" Prime", "") + "/Abilities")["tags"]
+            ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
+            ability_summaries = list(map(get_article_summary, ability_list))
+            ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
 
-                return [url_fm, article_summary, ability_summaries_fm, aside_table, acquisition_summary]
-            else:
-                return [url_fm, article_summary]
+            # find acquisition info for non-primes
+            acquisition_summary = ''
+            if "Prime" not in article_info["title"] and "Umbra" not in article_info["title"]:
+                for p in article_tree.findall('.//*[@id="mw-content-text"]/div/div/div/p'):
+                    acquisition_info = p.text_content().strip()
+                    if "component" in acquisition_info.lower() and "blueprint" in acquisition_info.lower():
+                        acquisition_summary = acquisition_info.split(". ")[0] + "."
+                        break
+
+            return [url_fm, article_summary, ability_summaries_fm, aside_table, acquisition_summary]
         # ABILITIES
         elif "AbilityU" in article_info["type"]:
             ability_summary = article_tree.findall('.//*[@id="mw-content-text"]/table/tr[1]/td[3]')[0].text_content().replace(article_info["title"], "", 1).replace("s−1", "per second.  ").strip()
@@ -319,9 +286,9 @@ def get_article_summary(title, detail=False):
                 return [url_fm, article_summary, stats_string]
             else:
                 mod_polarity = aside_info[-1]
-                mod_summary = article_summary + format_polarity(mod_polarity)
-                return [url_fm, mod_summary, stats_string]
+                return [url_fm, format_polarity(mod_polarity), article_summary, stats_string]
 
+        # Quests
         elif article_info["type"] == "Quest":
             spoiler_summary = "[Spoiler:](#s '" + article_summary + "')"
             return [url_fm, spoiler_summary, aside_table]

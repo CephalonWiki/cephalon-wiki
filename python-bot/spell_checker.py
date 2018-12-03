@@ -2,13 +2,10 @@
 
 import string
 from collections import Counter
-import all_articles
-
-# mapping from lower case article titles to titles with correct captilization
-case_dict = {w.lower():w for w in all_articles.article_title_list}
+from articles_list import articles_dict as articles
 
 # will use lower case words for the dictionary
-WORDS = Counter(map(lambda w: w.lower(), all_articles.article_title_list))
+WORDS = Counter(articles.keys())
 
 def P(word, N=sum(WORDS.values())):
     "Probability of `word`."
@@ -20,8 +17,8 @@ def correction(word):
 
     # if we actually make a correction, return word with proper capitalization using the case_dict
     if suggested_correction != word:
-        if suggested_correction in case_dict:
-            return case_dict[suggested_correction]
+        if suggested_correction in articles:
+            return articles[suggested_correction]['title']
         else:
             return suggested_correction.title()
     else:
