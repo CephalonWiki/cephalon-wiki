@@ -2,6 +2,10 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+9.12.2018
+
+- Current Dev branch scraps the use of the wikia api search suggestions.  Turns out it can actually retrieve articles when spell checker is not appropriate.
+
 16.11.2018
 
 - The bot uses a now out-of-date article list that needs to be updated.
