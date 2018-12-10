@@ -15,6 +15,10 @@ def P(word, N=sum(WORDS.values())):
     return WORDS[word] / N
 
 def correction(word):
+    #90% of entries have length <= 21
+    if len(word) > 21:
+        return word
+        
     "Most probable spelling correction for word."
     suggested_correction = max(candidates(word.lower()), key=P)
 
