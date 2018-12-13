@@ -17,7 +17,7 @@ import random
 header = "Hello Tenno.  Here is the information you requested.\n"
 footer = "\n\n*****\n\nCode available on [github](https://github.com/CephalonWiki/cephalon-wiki) | Bot by /u/1st_transit_of_venus"
 
-blacklist = ['e7fnpxb']
+blacklist = ['e7fnpxb', 'e5d8sl2']
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
