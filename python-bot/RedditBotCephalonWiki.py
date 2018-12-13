@@ -17,6 +17,7 @@ import random
 header = "Hello Tenno.  Here is the information you requested.\n"
 footer = "\n\n*****\n\nCode available on [github](https://github.com/CephalonWiki/cephalon-wiki) | Bot by /u/1st_transit_of_venus"
 
+blacklist = ['e7fnpxb']
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
@@ -50,7 +51,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 self.logger.debug("Comment not authored by CephalonWiki")
 
                 reply_authors = list(map(lambda c: c.author, comment.replies.list()))
-                if "CephalonWiki" not in reply_authors:
+                if "CephalonWiki" not in reply_authors and str(comment) not in blacklist:
                     self.logger.debug("Have not replied to comment %s", comment)
                     return True
                 else:

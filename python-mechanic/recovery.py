@@ -11,7 +11,7 @@ recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "recovery-ceph
 # recent_posts = recovery_bot.subreddit.submissions(time.time()-1.1*86400, time.time())
 
 # get submissions from last 24 hours
-recent_posts = recovery_bot.subreddit.top(time_filter="week")
+recent_posts = recovery_bot.subreddit.hot()
 
 # aggregate comments
 comments = []
