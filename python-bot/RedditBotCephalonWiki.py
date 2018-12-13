@@ -51,9 +51,13 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 self.logger.debug("Comment not authored by CephalonWiki")
 
                 reply_authors = list(map(lambda c: c.author, comment.replies.list()))
-                if "CephalonWiki" not in reply_authors and str(comment) not in blacklist:
-                    self.logger.debug("Have not replied to comment %s", comment)
-                    return True
+                if "CephalonWiki" not in reply_authors:
+                    if str(comment) not in blacklist:
+                        self.logger.debug("Have not replied to comment %s", comment)
+                        return True
+                    else:
+                        self.logger.info("Attempted to reply to blacklisted comment %s", comment)
+                        return False
                 else:
                     self.logger.warning("Already replied to comment %s", comment)
                     return False
