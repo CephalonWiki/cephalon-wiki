@@ -4,6 +4,8 @@ Will be updated with ongoing goals, tasks, updates, etc.
 
 9.12.2018
 
+- Spell checker can run a long time on pseudo code and other irrelevant queries that are picked up with curly braces.  Investigate ways to speed up.
+- Add more logging to spell checker.
 - Current Dev branch scraps the use of the wikia api search suggestions.  Turns out it can actually retrieve articles when spell checker is not appropriate.
 
 16.11.2018
