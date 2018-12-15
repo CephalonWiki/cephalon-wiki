@@ -105,7 +105,7 @@ class RedditBot:
             error_msg = "Exception raised:  " + str(e)
 
             self.logger.error(error_msg)
-            self.logger.error(traceback.format_exc())
+            #self.logger.error(traceback.format_exc())
 
             # take a nap and start again
             self.logger.debug("Napping...")
