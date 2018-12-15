@@ -7,6 +7,8 @@ from lxml import html
 
 import warframeWikiScrapper
 
+import CephalonWikiLogger
+
 
 # filter terms for aside by type
 weapon_filters = ["Mastery", "Average DPS", "Fire Rate", "Charge Time", "Crit Chance",

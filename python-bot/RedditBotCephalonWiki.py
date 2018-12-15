@@ -17,6 +17,8 @@ import random
 header = "Hello Tenno.  Here is the information you requested.\n"
 footer = "\n\n*****\n\nCode available on [github](https://github.com/CephalonWiki/cephalon-wiki) | Bot by /u/1st_transit_of_venus"
 
+blacklist = ['e7fnpxb', 'e5d8sl2']
+
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
     def __init__(self, name="cephalon-wiki", subreddit="warframe"):
@@ -50,8 +52,12 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
 
                 reply_authors = list(map(lambda c: c.author, comment.replies.list()))
                 if "CephalonWiki" not in reply_authors:
-                    self.logger.debug("Have not replied to comment %s", comment)
-                    return True
+                    if str(comment) not in blacklist:
+                        self.logger.debug("Have not replied to comment %s", comment)
+                        return True
+                    else:
+                        self.logger.info("Attempted to reply to blacklisted comment %s", comment)
+                        return False
                 else:
                     self.logger.warning("Already replied to comment %s", comment)
                     return False
@@ -80,11 +86,12 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         except Exception:
             self.logger.error("Retrieval for title %s failed.", title)
             self.logger.error(traceback.format_exc())
+
             if detail:
                 self.logger.warning("Trying to retrieve simple version of title %s.", title)
                 return self.format_article_summary(title)
             else:
-                self.logger.warning("No details retrieved for title %s", title)
+                self.logger.error("No details retrieved for title %s", title)
                 return ""
 
     def response(self, comment):

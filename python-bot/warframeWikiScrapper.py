@@ -12,7 +12,6 @@ import tagParser
 import CephalonWikiLogger
 
 
-# Helper function for mapping polarity names to a letter
 def format_polarity(mod_polarity):
     polarity_letter = ""
     if mod_polarity == "Madurai":

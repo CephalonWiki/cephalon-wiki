@@ -21,6 +21,10 @@ comparison.setLevel(logging.DEBUG)
 spell_checker = logging.getLogger('spell_checker')
 spell_checker.setLevel(logging.DEBUG)
 
+# Logging specifically for spelling correction
+comparison = logging.getLogger('comparison')
+comparison.setLevel(logging.DEBUG)
+
 
 ############
 # handlers #
@@ -40,14 +44,14 @@ no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-respo
 no_response_log.suffix = "%Y-%m-%d.txt"
 no_response_log.setLevel(logging.WARNING)
 
-exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-log", 'midnight')
-exception_log.suffix = "%Y-%m-%d.txt"
-exception_log.setLevel(logging.ERROR)
-
 # will log spelling corrections as warnings
 spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-log", 'midnight')
 spell_checker_log.suffix = "%Y-%m-%d.txt"
 spell_checker_log.setLevel(logging.WARNING)
+
+exception_log = logging.handlers.TimedRotatingFileHandler("../../logs/exceptions-log", 'midnight')
+exception_log.suffix = "%Y-%m-%d.txt"
+exception_log.setLevel(logging.ERROR)
 
 
 ##########################
@@ -78,7 +82,6 @@ no_response_log.setFormatter(formatter)
 exception_log.setFormatter(formatter)
 spell_checker_log.setFormatter(formatter)
 
-
 ###########################
 # Add handlers to loggers #
 ###########################
@@ -86,7 +89,6 @@ spell_checker_log.setFormatter(formatter)
 # all events are handled by the console
 
 # bot will log to every file/handler
-
 cephalon.addHandler(console)
 cephalon.addHandler(comment_log)
 cephalon.addHandler(no_response_log)
@@ -103,3 +105,7 @@ scrapper.addHandler(exception_log)
 # comparison will only log exceptions, as with scrapper
 comparison.addHandler(console)
 comparison.addHandler(exception_log)
+
+spell_checker.addHandler(console)
+spell_checker.addHandler(spell_checker_log)
+
