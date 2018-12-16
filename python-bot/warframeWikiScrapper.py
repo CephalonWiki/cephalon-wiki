@@ -79,18 +79,26 @@ def get_article_info(title):
 
         return article_info
     else:
-        CephalonWikiLogger.scrapper.warning("Article info not found for %s.  Checking spelling.", title)
-
-        if spell_checker.correction(title) != title and len(title) > 2:
-            corrected_title = spell_checker.correction(title)
-            CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
-
-            return get_article_info(corrected_title)
-        #else use search suggestions 
+        CephalonWikiLogger.scrapper.warning("Article info not found for %s.  Looking at variants...", title)
         
+        # Try spell checker first
+        corrected_title = spell_checker.correction(title)
+        if corrected_title != title and len(title) > 2:
+            CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
+            return get_article_info(corrected_title)
+            
+        # Then use search suggestions to correct query
         else:
-            CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
-            return article_info
+            suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + title.replace(" ", "_"))
+            suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
+            if suggestions_dict:
+                corrected_title = suggestions_dict[0]["title"]
+                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
+                return get_article_info(corrected_title)
+            
+            else:
+                CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
+                return article_info
 
 
 def get_article_summary(title, detail=True):
