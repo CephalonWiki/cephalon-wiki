@@ -2,15 +2,20 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+16.12.2018  
+
++ Added length maximum, more logging to spell checker (9.12.2018)
++ spell_checker now generates article list at startup (16.11.2018)
+
 9.12.2018
 
-- Spell checker can run a long time on pseudo code and other irrelevant queries that are picked up with curly braces.  Investigate ways to speed up.
-- Add more logging to spell checker.
+~~Spell checker can run a long time on pseudo code and other irrelevant queries that are picked up with curly braces.  Investigate ways to speed up.~~
+~~Add more logging to spell checker.~~
 - Current Dev branch scraps the use of the wikia api search suggestions.  Turns out it can actually retrieve articles when spell checker is not appropriate.
 
 16.11.2018
 
-- The bot uses a now out-of-date article list that needs to be updated.
+~~The bot uses a now out-of-date article list that needs to be updated.~~
 - Current list of articles for which retrieval fails:
 
   ~~- Excalibur Umbra:  Generalize treatment of Warframe names~~ Covered through overhaul of image-to-text replacement
