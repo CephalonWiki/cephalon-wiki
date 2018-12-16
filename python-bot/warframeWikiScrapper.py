@@ -86,6 +86,8 @@ def get_article_info(title):
             CephalonWikiLogger.spell_checker.warning("Spell checker corrected %s to %s", title, corrected_title)
 
             return get_article_info(corrected_title)
+        #else use search suggestions 
+        
         else:
             CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
             return article_info
