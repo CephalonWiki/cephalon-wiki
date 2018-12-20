@@ -31,19 +31,33 @@ def format_polarity(mod_polarity):
 
 
 # Given an article title, searches for article on wiki
-def get_article_info(title):
+def get_article_info(title, force_lookup = False):
     CephalonWikiLogger.scrapper.info("Searching for info on %s.", title)
 
-    # dictionary to populate and return
+    # Dictionary to populate and return
     article_info = {'id':-1, 'title':''}
-
-    # positive id means article found
-    if title.lower() in articles:
+    
+    article_json = ''
+    article_dict = {}
+    
+    # Attempt to lookup article
+    if title.lower() in articles: #pre-computed article info
         article_info = articles[title.lower()]
-
+        
         # access article json and convert to a dictionary
         article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + article_info['url'].replace('/wiki/','') + "&prop=revisions&rvprop=content&format=json")
         article_dict = json.loads(article_json.content.decode('utf-8'))['query']['pages']
+    elif force_lookup: #dynamically looks up title
+        article_info['title'] = title 
+        
+        # access article json and convert to a dictionary
+        article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + article_info['title'].replace(' ','_') + "&prop=revisions&rvprop=content&format=json")
+        article_dict = json.loads(article_json.content.decode('utf-8'))['query']['pages']
+        article_info["id"] = list(article_dict.keys())[0]
+        article_info["url"] = '/wiki/'+ article_info['title'].replace(' ','_').replace("&", "%26").replace(" and ", " %26 ")
+    
+    # If we find an article title, look it up!!
+    if article_info['title']:
 
         # attempt to determine article type
         article_type = ""
@@ -93,11 +107,16 @@ def get_article_info(title):
             suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
             if suggestions_dict:
                 corrected_title = suggestions_dict[0]["title"]
-                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
-                return get_article_info(corrected_title)
-            
+                if corrected_title != title:
+                    CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", title, corrected_title)
+                    return get_article_info(corrected_title)
+                else:
+                    CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", title)
+                    CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", title)
+                    return get_article_info(title, force_lookup = True)
+                
             else:
-                CephalonWikiLogger.scrapper.warning("No spelling correction found for %s.", title)
+                CephalonWikiLogger.spell_checker.warning("No spelling correction found for %s.", title)
                 return article_info
 
 
