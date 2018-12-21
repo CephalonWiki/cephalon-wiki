@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+20.12.2018
+- Summary retrieval fails for 2 out of the 4 Strain mods.  Investigate.
+
 17.12.2018
 
 + Added wikia search suggestions back to scrapper flow (9.12.2018)
