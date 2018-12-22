@@ -1,2 +1,4 @@
 python-mechanic/__pycache__/**
 python-bot/__pycache__/**
+*.xml
+*.iml
