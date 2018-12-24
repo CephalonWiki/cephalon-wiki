@@ -2,8 +2,12 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+22.12.2018
++ Upgraded pyOpenSSL in the hopes it will help with the frequent api rejection exceptions, crazy big exception log files, and pi freezes.
++ Retrieval failure for the Strain mods was due to the wiki.  Works now. (20.12.2018)
+
 20.12.2018
-- Summary retrieval fails for 2 out of the 4 Strain mods.  Investigate.
+~~Summary retrieval fails for 2 out of the 4 Strain mods.  Investigate.~~
 
 17.12.2018
 
