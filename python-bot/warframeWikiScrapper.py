@@ -126,7 +126,7 @@ def get_article_summary(title, detail=True):
     if article_info["id"] > 0:
 
         # formatting for reddit comment
-        url_fm = "###[" + article_info["title"] + "](https://warframe.fandom.com" + article_info["url"] + ")"
+        url_fm = "###[{0}](https://warframe.fandom.com{1})".format(article_info["title"], article_info["url"])
 
         # main processing
         article_main = requests.get("https://warframe.fandom.com" + article_info["url"])
@@ -136,8 +136,9 @@ def get_article_summary(title, detail=True):
         # find general article summary
         #
         article_summary = ""
+        article_title_mod = article_info["title"].replace("(Mod)","").strip()
         for p in article_tree.findall('.//*[@id="mw-content-text"]/p'):
-            if article_info["title"] in p.text_content() and '×' not in p.text_content():
+            if article_title_mod in p.text_content() and '×' not in p.text_content():
 
                 # Set the text of all the /a/img objects (e.g. Polarities, Currency)
                 for i in p.findall('./a/img'):
@@ -148,9 +149,9 @@ def get_article_summary(title, detail=True):
                 break
 
         # if we do not find an article summary from p tags, take first text paragraph
-        if article_info["title"] not in article_summary:
+        if article_title_mod not in article_summary:
             try:
-                paragraph = filter(lambda s: title in s and title != s and '×' not in s,
+                paragraph = filter(lambda s: article_title_mod in s and article_title_mod != s and '×' not in s,
                                    article_tree.find('.//*[@id="mw-content-text"]').text_content().split("\n")).__next__()
                 article_summary = paragraph.strip().replace("\xa0", "")
             except Exception:
