@@ -2,8 +2,12 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+5.1.2018
++ Item Comparison was broken following changes to the scrapper.  Fixed now.
++ No crashes in a few days.  
+
 22.12.2018
-+ Upgraded pyOpenSSL in the hopes it will help with the frequent api rejection exceptions, crazy big exception log files, and pi freezes.
++ Upgraded pyOpenSSL, requests in the hopes it will help with the frequent api rejection exceptions, crazy big exception log files, and pi freezes.
 + Retrieval failure for the Strain mods was due to the wiki; the mod name did not appear in the text of its article.  Works now. (20.12.2018)
 
 20.12.2018
