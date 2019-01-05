@@ -36,7 +36,7 @@ def get_item_stats(title):
         # url_fm = "###[" + article_info["title"] + "](" + article_info["url"] + ")"
 
         # main processing #
-        article_main = requests.get(article_info["url"])
+        article_main = requests.get("https://warframe.fandom.com" + article_info["url"])
         article_tree = html.fromstring(article_main.content)
 
         # processing for the aside
@@ -156,8 +156,8 @@ def get_item_stats(title):
             #     aside_table = "|" + "|\n|".join(map(lambda l: "|".join(l), [aside_titles, aside_line, aside_info])) + "|"
 
         article_info.__delitem__("tags")
-        article_info.__delitem__("codex")
         article_info.__delitem__("id")
+        article_info.__delitem__("ns")
         if "Charged Shot" in article_info:
             article_info["Main Attack"] = article_info["Charged Shot"]
             del article_info["Charged Shot"]
