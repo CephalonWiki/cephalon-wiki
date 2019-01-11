@@ -259,7 +259,7 @@ def get_article_summary(title, detail=True):
             ability_summaries_fm = ""
 
             ability_tags = get_article_info(article_info["title"].replace(" Umbra", "").replace(" Prime", "") + "/Abilities")["tags"]
-            ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ":" in ability_tags[i]]
+            ability_list = [ability_tags[i][1:] for i in sorted(ability_tags) if ability_tags[i].startswith(":")]
             ability_summaries = list(map(get_article_summary, ability_list))
             ability_summaries_fm = "Abilities:  " + ", ".join(list(map(lambda l: l[0][3:], ability_summaries)))
 
