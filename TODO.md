@@ -2,6 +2,10 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+7.1.2018
+- Crash happened today.  Happened recently on 7 Jan, 30 Dec, and 22 Dec, 12 Dec, almost weekly.  
+
+
 5.1.2018
 + Item Comparison was broken following changes to the scrapper.  Fixed now.
 + No crashes in a few days.  
