@@ -2,11 +2,17 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
-7.1.2018
+14.1.2019
+- Improve and clean-up comment logging
+    - Remove asterik rows, delineate between comments
+    - Add url for comments?
+    - Produce Daily report?
+
+7.1.2019
 - Crash happened today.  Happened recently on 7 Jan, 30 Dec, and 22 Dec, 12 Dec, almost weekly.  
 
 
-5.1.2018
+5.1.2019
 + Item Comparison was broken following changes to the scrapper.  Fixed now.
 + No crashes in a few days.  
 
