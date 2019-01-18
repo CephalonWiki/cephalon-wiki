@@ -21,10 +21,6 @@ comparison.setLevel(logging.DEBUG)
 spell_checker = logging.getLogger('spell_checker')
 spell_checker.setLevel(logging.DEBUG)
 
-# Logging specifically for spelling correction
-comparison = logging.getLogger('comparison')
-comparison.setLevel(logging.DEBUG)
-
 
 ############
 # handlers #
@@ -94,7 +90,7 @@ cephalon.addHandler(comment_log)
 cephalon.addHandler(no_response_log)
 cephalon.addHandler(exception_log)
 
-# spelling corrections are ogged
+# spelling corrections are logged
 spell_checker.addHandler(console)
 spell_checker.addHandler(spell_checker_log)
 
