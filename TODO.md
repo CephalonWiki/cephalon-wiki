@@ -2,6 +2,9 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+18.1.2018
+- Add short hand syntax for amp parts, eg {323}, and investigate scrapping from https://semlar.com/ampcalc/323
+
 14.1.2019
 - Improve and clean-up comment logging
     - Remove asterik rows, delineate between comments
