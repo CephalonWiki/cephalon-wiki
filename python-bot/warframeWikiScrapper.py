@@ -76,13 +76,20 @@ def get_article_info(title, force_lookup = False):
                     if t == ":" + article_info['title'] + "/Main":
                         #redirect for Warframes and Archwings
                         article_type = "Warframe or Archwing"
+                        break
                     elif "\n| name" in t:
                         article_type = t[:t.find("\n| name")].strip()
+                        break
                     elif "ModBox" in t:
                         article_type = "ModBox"
+                        break
                     elif t == "WeaponNav":
                         #  or "|Weapons" in t or
                         article_type = "Weapon"
+                        break
+                    elif t == "SentinelNavVisual":
+                        article_type = "Sentinel"
+                        break
         except KeyError as e:
             CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
 
@@ -137,7 +144,7 @@ def get_article_summary(title, detail=True):
         #
         article_summary = ""
         article_title_mod = article_info["title"].replace("(Mod)","").strip()
-        for p in article_tree.findall('.//*[@id="mw-content-text"]/p'):
+        for p in article_tree.findall('.//*[@id="mw-content-text"]/p') + article_tree.findall('.//*[@id="mw-content-text"]//div/p'):
             if article_title_mod in p.text_content() and '×' not in p.text_content():
 
                 # Set the text of all the /a/img objects (e.g. Polarities, Currency)
