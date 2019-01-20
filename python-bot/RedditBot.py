@@ -57,7 +57,7 @@ class RedditBot:
 
     def reply(self, comment):
         self.logger.info("******************************")
-        self.logger.info("Comment id:  %s", str(comment))
+        self.logger.info("Comment JSON:  https://www.reddit.com/api/info.json?id=t1_%s", str(comment))
         self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
 
         # preparing response using the module
