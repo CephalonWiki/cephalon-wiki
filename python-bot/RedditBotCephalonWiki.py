@@ -44,8 +44,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
 
 
     def should_respond(self, comment):
-        comment.refresh()
-
         if ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0):
             self.logger.debug("Comment contains matching braces")
 
@@ -97,8 +95,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 return ""
 
     def response(self, comment):
-        comment.refresh()
-
         try:
             article_titles = tagParser.get_tagged_articles(comment.body)
             article_summaries = "\n".join(map(lambda p: self.format_article_summary(*p), article_titles)).strip()
