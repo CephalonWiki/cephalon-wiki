@@ -36,9 +36,9 @@ comment_log.suffix = "%Y-%m-%d.txt"
 comment_log.setLevel(logging.INFO)
 
 # when not responding to a comment, will log a WARNING
-no_response_log = logging.handlers.TimedRotatingFileHandler("../../logs/no-response-log", 'midnight')
-no_response_log.suffix = "%Y-%m-%d.txt"
-no_response_log.setLevel(logging.WARNING)
+warning_log = logging.handlers.TimedRotatingFileHandler("../../logs/warning-log", 'midnight')
+warning_log.suffix = "%Y-%m-%d.txt"
+warning_log.setLevel(logging.WARNING)
 
 # will log spelling corrections as warnings
 spell_checker_log = logging.handlers.TimedRotatingFileHandler("../../logs/spell-checker-log", 'midnight')
@@ -62,19 +62,19 @@ class LevelFilter(object):
     def filter(self, record):
         return record.levelno in self.levels
 
-comment_log.addFilter(LevelFilter([logging.INFO, logging.WARNING]))
-no_response_log.addFilter(LevelFilter([logging.WARNING]))
+comment_log.addFilter(LevelFilter([logging.INFO]))
+warning_log.addFilter(LevelFilter([logging.WARNING]))
 
 ##############################
 # Add formatters to handlers #
 ##############################
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(funcName)s -  %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(funcName)20s -  %(message)s')
 
 # all files have the same format
 console.setFormatter(formatter)
 comment_log.setFormatter(formatter)
-no_response_log.setFormatter(formatter)
+warning_log.setFormatter(formatter)
 exception_log.setFormatter(formatter)
 spell_checker_log.setFormatter(formatter)
 
@@ -87,7 +87,7 @@ spell_checker_log.setFormatter(formatter)
 # bot will log to every file/handler
 cephalon.addHandler(console)
 cephalon.addHandler(comment_log)
-cephalon.addHandler(no_response_log)
+cephalon.addHandler(warning_log)
 cephalon.addHandler(exception_log)
 
 # spelling corrections are logged
@@ -101,7 +101,4 @@ scrapper.addHandler(exception_log)
 # comparison will only log exceptions, as with scrapper
 comparison.addHandler(console)
 comparison.addHandler(exception_log)
-
-spell_checker.addHandler(console)
-spell_checker.addHandler(spell_checker_log)
 

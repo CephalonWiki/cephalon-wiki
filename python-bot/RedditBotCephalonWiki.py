@@ -15,9 +15,7 @@ import random
 
 # For responding to comments
 header = "Hello Tenno.  Here is the information you requested.\n"
-footer = "\n\n*****\n\nCode available on [github](https://github.com/CephalonWiki/cephalon-wiki) | Bot by /u/1st_transit_of_venus"
-
-blacklist = ['e7fnpxb', 'e5d8sl2']
+footer = "\n\n*****\n\nCompare multiple items! Try {Excalibur, Volt, Mag} or {Lex, Lex Prime} | [Github](https://github.com/CephalonWiki/cephalon-wiki) | [Subreddit](/r/CephalonWiki) | "
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
@@ -43,37 +41,47 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_footer(footer)
 
 
+    # clean up the nested ifs yuck
     def should_respond(self, comment):
-        if ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0):
-            self.logger.debug("Comment contains matching braces")
 
-            if comment.author != "CephalonWiki":
-                self.logger.debug("Comment not authored by CephalonWiki")
+        # Prepare 4 criteria:  Match brackets, human author, no previous reply, not on blacklist
+        matches_brackets = ("{" in comment.body and comment.body.find("}", comment.body.rfind("{")) > 0)
+        human_author = comment.author != "CephalonWiki"
 
-                reply_authors = list(map(lambda c: c.author, comment.replies.list()))
-                if "CephalonWiki" not in reply_authors:
-                    if str(comment) not in blacklist:
-                        self.logger.debug("Have not replied to comment %s", comment)
-                        return True
-                    else:
-                        self.logger.info("Attempted to reply to blacklisted comment %s", comment)
-                        return False
-                else:
-                    self.logger.warning("Already replied to comment %s", comment)
-                    return False
-            else:
-                self.logger.warning("Comment authored by CephalonWiki")
-                return False
-        else:
-            # most comments will not contain matching braces
+        # Given updates to reply author code, blacklist should not be necessary
+        no_blacklist = str(comment) not in ['e7fnpxb', 'e5d8sl2']
+
+        # refresh comment before retrieving replies
+        comment.refresh()
+        comment.replies.replace_more(limit = 0)
+        reply_authors = list(map(lambda c: c.author, comment.replies.list()))
+        no_reply = "CephalonWiki" not in reply_authors
+
+        if not matches_brackets:
+            # most comments will not invoke the bot, so take no action
             return False
+        elif not human_author:
+            self.logger.warning("Comment authored by CephalonWiki")
+            return False
+        elif not no_reply:
+            self.logger.warning("Already replied to comment %s", comment)
+            return False
+        elif not no_blacklist:
+            self.logger.exception("Attempted to reply to blacklisted comment %s", comment)
+            return False
+        else:
+            # Comment meets minimum criteria.
+            self.logger.debug("Should respond to comment %s", comment)
+            self.logger.info("***** NEW COMMENT *****")
+            return True
+
 
     # prepare summary of article, as a string
     # scrapping modules used here
     def format_article_summary(self, title, detail=False):
         try:
             if "," in title:
-                summary_details = warframeWikiItemComparer.compare_items(*title.split(","))
+                summary_details = warframeWikiItemComparer.compare_items(title.split(","))
             else:
                 summary_details = warframeWikiScrapper.get_article_summary(title, detail)
 
@@ -100,13 +108,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             article_summaries = "\n".join(map(lambda p: self.format_article_summary(*p), article_titles)).strip()
 
             return article_summaries
-        # Error catching for parsing layer and below
         except Exception as e:
-            error_msg = "Parsing Exception raised - " + str(e) + " - in comment " + str(comment)
-            self.logger.error(error_msg)
-
-            # if problem not with reddit, send mechanic a message
-            # deprecate this
-            #self.mechanic.message("Parsing Exception Raised", traceback.format_exc())
-
+            self.logger.error("No response to comment %s", comment)
             return ""

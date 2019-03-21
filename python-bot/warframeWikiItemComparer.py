@@ -1,4 +1,5 @@
 import itertools
+import functools
 import collections
 
 import requests
@@ -19,7 +20,7 @@ warframe_filters = ["Mastery Rank", "Health", "Shield", "Armor", "Energy", "Powe
 comp_filters = ["Health", "Shield Capacity", "Armor", "Power", "Slash", "Crit Chance", "Crit Multiplier",
                 "Status Chance", "Polarities", "Default Weapon", "Exclusive Mods"]
 aside_filters = {"Weapon": weapon_filters,
-                 "Warframe": warframe_filters,
+                 "Warframe or Archwing": warframe_filters,
                  "Archwing": warframe_filters,
                  "Sentinel": comp_filters,
                  "Kubrow": comp_filters,
@@ -30,7 +31,7 @@ def get_item_stats(title):
     article_info = collections.OrderedDict(warframeWikiScrapper.get_article_info(title))
 
     # aside_table = ""
-    if int(article_info["id"]) > 0 and article_info["type"] in ["Weapon", "Warframe", "Archwing", "Sentinel", "Kubrow", "Kavat"]:
+    if int(article_info["id"]) > 0 and article_info["type"] in ["Warframe or Archwing", "Weapon", "Warframe", "Archwing", "Sentinel", "Kubrow", "Kavat"]:
 
         # formatting for reddit comment
         # url_fm = "###[" + article_info["title"] + "](" + article_info["url"] + ")"
@@ -221,43 +222,45 @@ def get_item_stats(title):
         return article_info
 
 
-def compare_items(item1, item2):
-    item1_dict = get_item_stats(item1.strip())
-    item2_dict = get_item_stats(item2.strip())
+def compare_items(items):
+    item_stats = [get_item_stats(i.strip()) for i in items]
 
-    titles = ["Item"]
-    url_fm1 = "[" + item1_dict["title"] + "](" + item1_dict["url"] + ")"
-    url_fm2 = "[" + item2_dict["title"] + "](" + item2_dict["url"] + ")"
-    item1_info = [url_fm1]
-    item2_info = [url_fm2]
+    item_dicts = collections.OrderedDict({i["title"]:i for i in item_stats})
+    item_infos = collections.OrderedDict({i["title"]:["[" + i["title"] + "](" + "https://warframe.fandom.com" + i["url"] + ")"] for i in item_stats})
 
-    if not (item1_dict or item2_dict) or item1_dict["type"] != item2_dict["type"]:
+    if functools.reduce(lambda x, y: x*y, map(lambda i: len(i["title"]), item_dicts.values())) == 0 \
+            or len(set(map(lambda i: i["type"], item_dicts.values()))) > 1:
         return None
-    elif item1_dict["type"] == "ModBox":
-        return warframeWikiScrapper.get_article_summary(item1, True) + ["*****"] \
-               + warframeWikiScrapper.get_article_summary(item2, True)
+    elif item_stats[0]["type"] == "ModBox":
+        # Reply with normal mod summary
+        # return warframeWikiScrapper.get_article_summary(item1, True) + ["*****"] + warframeWikiScrapper.get_article_summary(item2, True)
+        pass
     else:
-        common_keys = [k for k in item1_dict.keys() if k in item2_dict.keys()]
+        titles = ["Item"]
+        common_keys = functools.reduce(lambda x, y: [k for k in x if k in y], map(lambda i: i.keys(), item_dicts.values()))
+        print(common_keys)
 
         for header in common_keys[::-1]:
             if header in ["url", "type", "title"]:
                 continue
             else:
-                stat_names = [name for name in item1_dict[header].keys() if name in item2_dict[header].keys()]
+                stat_names = functools.reduce(lambda x, y: [k for k in x if k in y], map(lambda i: i[header].keys(), item_dicts.values()))
                 if header == "Main Attack":
                     stat_names = [stat_names[-1]] + stat_names[:-1]
+                print(stat_names)
 
                 for stat_name in stat_names:
                     if stat_name == "Total Damage":
                         titles.append(header)
                     else:
                         titles.append(stat_name)
-                    item1_info.append(item1_dict[header][stat_name])
-                    item2_info.append(item2_dict[header][stat_name])
+
+                    for i in item_infos:
+                        item_infos[i].append(item_dicts[i][header][stat_name])
+                        print(item_infos[i])
+
 
         lines = [":---------:"] * len(titles)
-        aside_table = "|" + "|\n|".join(map(lambda l: "|".join(l), [titles, lines, item1_info, item2_info])) + "|"
+        aside_table = "|" + "|\n|".join(map(lambda l: "|".join(l), [titles, lines] + list(item_infos.values()))) + "|"
         return [aside_table]
-
-
 
