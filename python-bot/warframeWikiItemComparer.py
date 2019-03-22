@@ -238,7 +238,6 @@ def compare_items(items):
     else:
         titles = ["Item"]
         common_keys = functools.reduce(lambda x, y: [k for k in x if k in y], map(lambda i: i.keys(), item_dicts.values()))
-        print(common_keys)
 
         for header in common_keys[::-1]:
             if header in ["url", "type", "title"]:
@@ -247,7 +246,6 @@ def compare_items(items):
                 stat_names = functools.reduce(lambda x, y: [k for k in x if k in y], map(lambda i: i[header].keys(), item_dicts.values()))
                 if header == "Main Attack":
                     stat_names = [stat_names[-1]] + stat_names[:-1]
-                print(stat_names)
 
                 for stat_name in stat_names:
                     if stat_name == "Total Damage":
@@ -257,7 +255,6 @@ def compare_items(items):
 
                     for i in item_infos:
                         item_infos[i].append(item_dicts[i][header][stat_name])
-                        print(item_infos[i])
 
 
         lines = [":---------:"] * len(titles)

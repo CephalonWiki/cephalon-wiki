@@ -4,4 +4,4 @@ sys.path.append('../python-bot')
 import RedditBotCephalonWiki
 
 test_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "test-cephalon-wiki", subreddit = "cephalonwiki")
-test_bot.scan(test_bot.subreddit.stream.comments())
+test_bot.scan()

@@ -69,9 +69,18 @@ class RedditBot:
             comment.reply(self.header + response + self.footer)
             self.logger.info("Response posted to Reddit.")
 
-    def scan(self, stream):
+    def scan(self, stream = None):
         try:
-            for comment in stream:
+            # Stream set-up
+            # Subreddit comment stream must be re-initialized after exception
+            # Otherwise, make a copy of the stream because...I forgot?  lolz
+            scan_stream = None
+            if not stream:
+                scan_stream = self.subreddit.stream.comments()
+            else:
+                scan_stream = stream.copy()
+
+            for comment in scan_stream:
                 self.logger.debug("Reading comment %s", comment)
 
                 # check if we should respond
@@ -93,5 +102,4 @@ class RedditBot:
             self.logger.debug("Napping...")
             time.sleep(60)
 
-            # take copy to avoid empty stream
             self.scan(stream)
