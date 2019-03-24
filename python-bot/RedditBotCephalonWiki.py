@@ -57,10 +57,10 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             no_blacklist = str(comment) not in ['e7fnpxb', 'e5d8sl2']
 
             if not human_author:
-                self.logger.warning("Comment authored by CephalonWiki")
+                self.logger.debug("Comment authored by CephalonWiki")
                 return False
             elif not no_blacklist:
-                self.logger.exception("Attempted to reply to blacklisted comment %s", comment)
+                self.logger.error("Attempted to reply to blacklisted comment %s", comment)
                 return False
             else:
                 # Now that the comment is human-authored and contains matching braces...
@@ -70,7 +70,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 reply_authors = list(map(lambda c: c.author, comment.replies.list()))
                 no_reply = "CephalonWiki" not in reply_authors
                 if not no_reply:
-                    self.logger.warning("Already replied to comment %s", comment)
+                    self.logger.debug("Already replied to comment %s", comment)
                     return False
                 else:
                     # Comment meets minimum criteria.

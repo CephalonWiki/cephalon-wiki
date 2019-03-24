@@ -2,6 +2,8 @@ import datetime
 import time
 import traceback
 import logging
+import subprocess
+import requests
 
 class RedditBot:
 
@@ -69,7 +71,7 @@ class RedditBot:
             comment.reply(self.header + response + self.footer)
             self.logger.info("Response posted to Reddit.")
 
-    def scan(self, stream = None):
+    def scan(self, stream = None, reboot = 0):
         try:
             # Stream set-up
             # Subreddit comment stream must be re-initialized after exception
@@ -95,11 +97,24 @@ class RedditBot:
         except KeyboardInterrupt:
             self.logger.debug("Interrupting...")
 
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error("Exception raised:  " + str(e))
+
+            if reboot < 5:
+                # take a nap and start again
+                self.logger.debug("Napping...")
+                time.sleep(30)
+
+                self.scan(stream, reboot+1)
+            else:
+                self.logger.error("Five retries attempted.  Rebooting...")
+                subprocess.run('reboot')
+
         except Exception as e:
             self.logger.error("Exception raised:  " + str(e))
 
             # take a nap and start again
             self.logger.debug("Napping...")
-            time.sleep(60)
+            time.sleep(30)
 
-            self.scan(stream)
+            self.scan(stream, reboot)

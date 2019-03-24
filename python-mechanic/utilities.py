@@ -15,5 +15,3 @@ def article(title):
     article_main = requests.get("https://warframe.fandom.com/wiki/" + title.replace(' ','_').replace("&", "%26").replace(" and ", " %26 "))
     article_tree = html.fromstring(article_main.content)
     return article_tree
-
-def
