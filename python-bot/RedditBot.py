@@ -3,7 +3,6 @@ import time
 import traceback
 import logging
 import subprocess
-import requests
 
 class RedditBot:
 
@@ -97,10 +96,12 @@ class RedditBot:
         except KeyboardInterrupt:
             self.logger.debug("Interrupting...")
 
-        except requests.exceptions.ConnectionError as e:
+        except Exception as e:
             self.logger.error("Exception raised:  " + str(e))
 
             if reboot < 5:
+                self.logger.debug("%s retries attempted.", reboot)
+
                 # take a nap and start again
                 self.logger.debug("Napping...")
                 time.sleep(30)
@@ -109,12 +110,3 @@ class RedditBot:
             else:
                 self.logger.error("Five retries attempted.  Rebooting...")
                 subprocess.run('reboot')
-
-        except Exception as e:
-            self.logger.error("Exception raised:  " + str(e))
-
-            # take a nap and start again
-            self.logger.debug("Napping...")
-            time.sleep(30)
-
-            self.scan(stream, reboot)
