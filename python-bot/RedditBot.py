@@ -70,7 +70,7 @@ class RedditBot:
             comment.reply(self.header + response + self.footer)
             self.logger.info("Response posted to Reddit.")
 
-    def scan(self, stream = None, reboot = 0):
+    def scan(self, stream = None):
         try:
             # Stream set-up
             # Subreddit comment stream must be re-initialized after exception
@@ -93,20 +93,5 @@ class RedditBot:
 
                     self.respond(comment)
 
-        except KeyboardInterrupt:
-            self.logger.debug("Interrupting...")
-
         except Exception as e:
             self.logger.error("Exception raised:  " + str(e))
-
-            if reboot < 5:
-                self.logger.debug("%s retries attempted.", reboot)
-
-                # take a nap and start again
-                self.logger.debug("Napping...")
-                time.sleep(30)
-
-                self.scan(stream, reboot+1)
-            else:
-                self.logger.error("Five retries attempted.  Rebooting...")
-                subprocess.run('reboot')
