@@ -53,7 +53,7 @@ def get_article_info(title, force_lookup = False):
         # access article json and convert to a dictionary
         article_json = requests.get("http://warframe.wikia.com/api.php?action=query&titles=" + article_info['title'].replace(' ','_') + "&prop=revisions&rvprop=content&format=json")
         article_dict = json.loads(article_json.content.decode('utf-8'))['query']['pages']
-        article_info["id"] = list(article_dict.keys())[0]
+        article_info["id"] = int(list(article_dict.keys())[0])
         article_info["url"] = '/wiki/'+ article_info['title'].replace(' ','_').replace("&", "%26").replace(" and ", " %26 ")
     
     # If we find an article title, look it up!!
