@@ -16,6 +16,8 @@ while True:
         wiki_bot.logger.debug("Interrupting...")
         break
     except Exception as e:
+        wiki_bot.logger.error("Exception raised:  " + str(e))
+
         if reboot < 5:
             reboot += 1
             wiki_bot.logger.debug("%s retries attempted.", reboot)
