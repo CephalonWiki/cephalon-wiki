@@ -127,8 +127,13 @@ def get_article_info(title, force_lookup = False):
                 return article_info
 
 
-def get_article_summary(title, detail=True):
-    article_info = get_article_info(title)
+
+def get_article_summary(title, detail=True, info = None):
+
+    if info:
+        article_info = info
+    else:
+        article_info = get_article_info(title)
 
     if article_info["id"] > 0:
 
@@ -322,7 +327,7 @@ def get_article_summary(title, detail=True):
                 return [url_fm, article_summary, stats_string]
             else:
                 mod_polarity = aside_info[-1]
-                return [url_fm, format_polarity(mod_polarity), article_summary, stats_string]
+                return [url_fm, article_summary, format_polarity(mod_polarity), stats_string]
 
         # Quests
         elif article_info["type"] == "Quest":

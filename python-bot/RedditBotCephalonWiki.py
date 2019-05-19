@@ -10,12 +10,13 @@ import tagParser
 
 import warframeWikiScrapper
 import warframeWikiItemComparer
+import warframeWikiSubsectionFetcher
 
 import random
 
 # For responding to comments
 header = "Hello Tenno.  Here is the information you requested.\n"
-footer = "\n\n*****\n\nCompare multiple items! Try {Excalibur, Volt, Mag} or {Lex, Lex Prime} | [Github](https://github.com/CephalonWiki/cephalon-wiki) | [Subreddit](/r/CephalonWiki) | "
+footer = "\n\n*****\n\n Want a summary of a subsection?  Try {Vazarin#Protective Dash} or {Fishing#Mortus Lungfish} | [Github](https://github.com/CephalonWiki/cephalon-wiki) | [Subreddit](/r/CephalonWiki) | "
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
@@ -85,6 +86,8 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         try:
             if "," in title:
                 summary_details = warframeWikiItemComparer.compare_items(title.split(","))
+            elif "#" in title:
+                summary_details = warframeWikiSubsectionFetcher.get_article_subsection(*title.split("#"))
             else:
                 summary_details = warframeWikiScrapper.get_article_summary(title, detail)
 
