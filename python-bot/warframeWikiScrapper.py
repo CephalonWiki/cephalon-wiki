@@ -1,7 +1,6 @@
 import itertools
 
 import requests
-import traceback
 import json
 from lxml import html
 
@@ -12,37 +11,6 @@ import tagParser
 
 import CephalonWikiLogger
 
-import warframeWikiItemComparer
-import warframeWikiSubsectionFetcher
-
-
-# prepare summary of article, as a string
-# scrapping modules used here
-def format_article_summary(self, title, detail=False):
-    try:
-        if "," in title:
-            summary_details = warframeWikiItemComparer.compare_items(title.split(","))
-        elif "#" in title:
-            summary_details = warframeWikiSubsectionFetcher.get_article_subsection(*title.split("#"))
-        else:
-            summary_details = get_article_summary(title, detail)
-
-        if summary_details:
-            self.logger.info("Retrieval for title %s succeeded.", title)
-            return "\n\n".join(["*****"] + summary_details)
-        else:
-            self.logger.warning("No details retrieved for title %s", title)
-            return ""
-    except Exception:
-        self.logger.error("Retrieval for title %s failed.", title)
-        self.logger.error(traceback.format_exc())
-
-        if detail:
-            self.logger.warning("Trying to retrieve simple version of title %s.", title)
-            return self.format_article_summary(title)
-        else:
-            self.logger.error("No details retrieved for title %s", title)
-            return ""
 
 def format_polarity(mod_polarity):
     polarity_letter = ""
