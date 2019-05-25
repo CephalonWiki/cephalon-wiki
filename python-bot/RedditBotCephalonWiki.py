@@ -82,36 +82,46 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
 
     # prepare summary of article, as a string
     # scrapping modules used here
-    def format_article_summary(self, title, detail=False):
+    def format_article_summary(self, tag, detail=False):
         try:
-            if "," in title:
-                summary_details = warframeWikiItemComparer.compare_items(title.split(","))
-            elif "#" in title:
-                summary_details = warframeWikiSubsectionFetcher.get_article_subsection(*title.split("#"))
+
+            if "," in tag:
+                self.logger.info("Routing to Item Comparison module.")
+                summary_details = warframeWikiItemComparer.compare_items(map(lambda tag: warframeWikiScrapper.get_title(tag), tag.split(",")))
             else:
-                summary_details = warframeWikiScrapper.get_article_summary(title, detail)
+                title = ""
+                redirected_title = warframeWikiScrapper.get_article_info(tag)["title"]
+                if "#" in tag or "#" in redirected_title:
+                    t, subsection = redirected_title.split("#") if "#" in redirected_title else tag.split("#")
+                    title = warframeWikiScrapper.get_title(t)
+                    self.logger.info("Routing to Subsection Fetcher module.")
+                    summary_details = warframeWikiSubsectionFetcher.get_article_subsection(t, subsection.replace("_", " "))
+                else:
+                    title = warframeWikiScrapper.get_title(tag)
+                    self.logger.info("Routing to Scrapper module.")
+                    summary_details = warframeWikiScrapper.get_article_summary(title)
 
             if summary_details:
-                self.logger.info("Retrieval for title %s succeeded.", title)
+                self.logger.info("Retrieval for tag %s succeeded.", tag)
                 return "\n\n".join(["*****"] + summary_details)
             else:
-                self.logger.warning("No details retrieved for title %s", title)
+                self.logger.warning("No details retrieved for tag %s", tag)
                 return ""
         except Exception:
-            self.logger.error("Retrieval for title %s failed.", title)
+            self.logger.error("Retrieval for tag %s failed.", tag)
             self.logger.error(traceback.format_exc())
 
             if detail:
-                self.logger.warning("Trying to retrieve simple version of title %s.", title)
-                return self.format_article_summary(title)
+                self.logger.warning("Trying to retrieve simple version of tag %s.", tag)
+                return self.format_article_summary(tag)
             else:
-                self.logger.error("No details retrieved for title %s", title)
+                self.logger.error("No details retrieved for tag %s", tag)
                 return ""
 
     def response(self, comment):
         try:
-            article_titles = tagParser.get_tagged_articles(comment.body)
-            article_summaries = "\n".join(map(lambda p: self.format_article_summary(*p), article_titles)).strip()
+            article_tags = tagParser.get_tagged_articles(comment.body)
+            article_summaries = "\n".join(map(lambda p: self.format_article_summary(*p), article_tags)).strip()
 
             return article_summaries
         except Exception as e:
