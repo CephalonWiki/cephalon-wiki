@@ -70,43 +70,24 @@ class RedditBot:
             comment.reply(self.header + response + self.footer)
             self.logger.info("Response posted to Reddit.")
 
-    def scan(self, stream = None, reboot = 0):
-        try:
-            # Stream set-up
-            # Subreddit comment stream must be re-initialized after exception
-            # Otherwise, make a copy of the stream because...I forgot?  lolz
-            scan_stream = None
-            if not stream:
-                scan_stream = self.subreddit.stream.comments()
-            else:
-                scan_stream = stream.copy()
+    def scan(self, stream = None):
+        # Stream set-up
+        # Subreddit comment stream must be re-initialized after exception
+        # Otherwise, make a copy of the stream because...I forgot?  lolz
+        scan_stream = None
+        if not stream:
+            scan_stream = self.subreddit.stream.comments()
+        else:
+            scan_stream = stream.copy()
 
-            for comment in scan_stream:
-                self.logger.debug("Reading comment %s", comment)
+        for comment in scan_stream:
+            self.logger.debug("Reading comment %s", comment)
 
-                # check if we should respond
-                if self.should_respond(comment):
-                    # 30 s window for redditor to edit comment
-                    nap_time = max(31 - int(time.time() - comment.created_utc), 0)
-                    self.logger.debug("Waiting %s seconds to respond to comment %s", nap_time, comment)
-                    time.sleep(nap_time)
+            # check if we should respond
+            if self.should_respond(comment):
+                # 30 s window for redditor to edit comment
+                nap_time = max(31 - int(time.time() - comment.created_utc), 0)
+                self.logger.debug("Waiting %s seconds to respond to comment %s", nap_time, comment)
+                time.sleep(nap_time)
 
-                    self.respond(comment)
-
-        except KeyboardInterrupt:
-            self.logger.debug("Interrupting...")
-
-        except Exception as e:
-            self.logger.error("Exception raised:  " + str(e))
-
-            if reboot < 5:
-                self.logger.debug("%s retries attempted.", reboot)
-
-                # take a nap and start again
-                self.logger.debug("Napping...")
-                time.sleep(30)
-
-                self.scan(stream, reboot+1)
-            else:
-                self.logger.error("Five retries attempted.  Rebooting...")
-                subprocess.run('reboot')
+                self.respond(comment)

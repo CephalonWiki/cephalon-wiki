@@ -20,6 +20,7 @@ warframe_filters = ["Mastery Rank", "Health", "Shield", "Armor", "Energy", "Powe
 comp_filters = ["Health", "Shield Capacity", "Armor", "Power", "Slash", "Crit Chance", "Crit Multiplier",
                 "Status Chance", "Polarities", "Default Weapon", "Exclusive Mods"]
 aside_filters = {"Weapon": weapon_filters,
+                 "Warframe": warframe_filters,
                  "Warframe or Archwing": warframe_filters,
                  "Archwing": warframe_filters,
                  "Sentinel": comp_filters,
