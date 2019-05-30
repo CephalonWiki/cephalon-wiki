@@ -1,3 +1,4 @@
+import re
 from lxml import html
 import requests
 from pprint import pprint
@@ -80,7 +81,7 @@ def get_summary_by_title(url, subsection_title):
     for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
         try:
             #print(t.text_content().strip(), t.text_content().strip() == subsection_title)
-            if t.text_content().strip() == subsection_title:
+            if t.text_content().strip() == subsection_title or subsection_title in re.split(r"\n\n,", t.text_content()):
                 #print(t.text_content().strip() == subsection_title)
                 title_tag = t
                 found_title = True
@@ -106,7 +107,7 @@ def get_summary_by_title(url, subsection_title):
     while not subsection_summary:
         subsection_children = list(current_subsection.itertext())
         #print(subsection_children)
-        for t in subsection_children[subsection_children.index(title_tag.text_content().strip()) + 1:]:
+        for t in subsection_children[subsection_children.index(title_tag.text_content().strip()):]:
             if t.strip() not in blacklist:
                 subsection_summary += t
                 found_summary = True
