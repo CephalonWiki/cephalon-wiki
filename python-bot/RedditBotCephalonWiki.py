@@ -84,10 +84,15 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
     # scrapping modules used here
     def format_article_summary(self, tag, detail=False):
         try:
-
+            summary_details = ""
             if "," in tag:
                 self.logger.info("Routing to Item Comparison module.")
                 summary_details = warframeWikiItemComparer.compare_items(map(lambda tag: warframeWikiScrapper.get_title(tag), tag.split(",")))
+
+                if not summary_details:
+                    self.logger.info("Comparison retrieval failed.  Routing list of articles to scrapper module.")
+                    summary_details = sum(map(lambda tag: warframeWikiScrapper.get_article_summary(tag), tag.split(",")), [])
+
             else:
                 title = ""
                 redirected_title = warframeWikiScrapper.get_article_info(tag)["title"]

@@ -81,7 +81,7 @@ def get_summary_by_title(url, subsection_title):
     for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
         try:
             #print(t.text_content().strip(), t.text_content().strip() == subsection_title)
-            if t.text_content().strip() == subsection_title or subsection_title in re.split(r"\n\n,", t.text_content()):
+            if t.text_content().strip() == subsection_title or subsection_title in re.split(r"\n\n", t.text_content().strip()):
                 #print(t.text_content().strip() == subsection_title)
                 title_tag = t
                 found_title = True
@@ -107,12 +107,12 @@ def get_summary_by_title(url, subsection_title):
     while not subsection_summary:
         subsection_children = list(current_subsection.itertext())
         #print(subsection_children)
-        for t in subsection_children[subsection_children.index(title_tag.text_content().strip()):]:
+        for t in subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]:
             if t.strip() not in blacklist:
                 subsection_summary += t
                 found_summary = True
 
-                if t.endswith("\n"):
+                if t.endswith(".\n"):
                     break
 
         if found_summary:
@@ -122,17 +122,21 @@ def get_summary_by_title(url, subsection_title):
 
     return subsection_summary.strip()
 
-# test_cases = [("Mirage", "Hall of Mirrors"),
-#               ("Mirage/Abilities", "Hall of Mirrors"),
-#               ("Focus/Vazarin", "Protective Dash"),
-#               ("Vazarin", "Protective Dash"),
-#               ("Focus", "Protective Dash"),
-#               ("Ephemera", "Freezing Step"),
-#               ("Orbiter", "Landing Craft")]
-#
-# for t in test_cases:
-#     print("\n")
-#     print(t[1])
-#     print("==================")
-#     print(get_article_subsection(t[0], t[1]))
-#     print("++++++++++++++")
+if __name__ == "__main__":
+    test_cases = [("Mirage", "Hall of Mirrors"),
+                  ("Mirage/Abilities", "Hall of Mirrors"),
+                  ("Focus/Vazarin", "Protective Dash"),
+                  ("Vazarin", "Protective Dash"),
+                  ("Focus", "Protective Dash"),
+                  ("Ephemera", "Freezing Step"),
+                  ("Ephemera", "Smoking Body"),
+                  ("Orbiter", "Landing Craft"),
+                  ("Critical Hit", "Crit Tiers"),
+                  ("Fishing", "Mortus Lungfish")]
+
+    for t in test_cases:
+        pprint("\n")
+        pprint(t[1])
+        pprint("==================")
+        pprint(get_article_subsection(t[0], t[1]))
+        pprint("++++++++++++++")
