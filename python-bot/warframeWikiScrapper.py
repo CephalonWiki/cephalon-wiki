@@ -34,6 +34,7 @@ def get_title(tag):
 
     # Pass along if title is known
     if tag.lower() in articles:
+        CephalonWikiLogger.scrapper.info("Article %s present in dictionary.", tag)
         return tag
     # Attempt to lookup article otherwise
     else:
@@ -51,11 +52,11 @@ def get_title(tag):
             suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
             if suggestions_dict:
                 corrected_title = suggestions_dict[0]["title"]
-                if corrected_title != tag:
+                if corrected_title != tag and len(tag) > 2:
                     CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", tag, corrected_title)
                     return corrected_title
                 else:
-                    CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", tag)
+                    CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
                     CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
                     return tag
             else:
@@ -72,6 +73,8 @@ def get_article_info(title):
 
         # correction for primes
         article_info["title"] = article_info["title"].replace("/", " ")
+        if "Focus" in article_info["title"]:
+            article_info["title"] = article_info["title"].split(" ")[-1]
     else:
         article_info["title"] = title
         article_info["url"] = '/wiki/' + article_info['title'].replace(' ', '_').replace("&", "%26").replace(" and "," %26 ")
@@ -127,7 +130,7 @@ def get_article_info(title):
                     article_type = "Sentinel"
                     break
     except KeyError as e:
-        CephalonWikiLogger.scrapper.exception("KeyError: with " + str(e) + " for title " + title)
+        CephalonWikiLogger.scrapper.error("KeyError: with " + str(e) + " for title " + title)
 
     # Assemble look up information into dictionary
     article_info["type"] = article_type
@@ -158,7 +161,7 @@ def get_article_summary(title, detail=True, info = None):
         article_summary = ""
         article_title_mod = article_info["title"].replace("(Mod)","").strip()
         for p in article_tree.findall('.//*[@id="mw-content-text"]/p') + article_tree.findall('.//*[@id="mw-content-text"]//div/p'):
-            if article_title_mod in p.text_content() and '×' not in p.text_content():
+            if article_title_mod.lower() in p.text_content().lower() and article_title_mod != p.text_content().strip() and '×' not in p.text_content():
 
                 # Set the text of all the /a/img objects (e.g. Polarities, Currency)
                 for i in p.findall('./a/img'):

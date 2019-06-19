@@ -24,7 +24,7 @@ def get_article_subsection(title, subsection):
         # If we find nothing, stick with the old logic and return the page summary
         return warframeWikiScrapper.get_article_summary(title, info = title_article_info)
 
-def get_subsection_summary(url, subsection_title):
+def get_subsection_summary(url, subsection_title = "mw-content-text"):
     CephalonWikiLogger.scrapper.info("Searching for subsection " + subsection_title + ".")
 
     # First, try to search directly by id
@@ -54,20 +54,25 @@ def get_summary_by_id(url, subsection_title):
 
     current_subsection = title_tag
     subsection_summary = ""
-    found_summary = False
+    status = None
     blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", subsection_title]
+    tag_blacklist = ["figure", "table"]
 
     while not subsection_summary:
         subsection_children = list(current_subsection.iter())
-        for t in subsection_children[subsection_children.index(title_tag):]:
-            if t.text_content().strip() not in blacklist:
+        for t in subsection_children[subsection_children.index(title_tag)+1:]:
+            if t.tag in tag_blacklist:
+                t.drop_tree()
+                status = False
+                break
+            elif t.text_content().strip() not in blacklist:
                 subsection_summary = t.text_content().strip()
-                found_summary = True
+                status = True
                 break
 
-        if found_summary:
+        if status == True:
             break
-        else:
+        elif status == None:
             current_subsection = current_subsection.getparent()
 
     return subsection_summary

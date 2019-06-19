@@ -10,7 +10,7 @@ test_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "test-cephalon-wik
 if __name__ == "__main__":
     test_cases = ["Mirage",
                   "Hall of Mirrors",
-                  "Vazarin", #redirects to "Focus Vazarin" and fails
+                  "Vazarin", #FIXED:  redirects with "Focus/Vazarin" to scrapper
                   "Protective Dash",
                   "Lex Prime",
                   "Lex, Lex Prime",
@@ -18,7 +18,8 @@ if __name__ == "__main__":
                   "Vitality, Primed Vitality",
                   "Freezing Step",
                   "Landing Craft",
-                  "Crit Tiers", #failed lookup, no redirection
+                  "Critical Hit", #NOT FIXED:  Figure tag at top of page; moved after first paragraph
+                  "Crit Tiers", #NOT FIXED:  Table tag at top of section; moved after first paragraph
                   "Mortus Lungfish"]
 
     for t in test_cases:
@@ -30,3 +31,4 @@ if __name__ == "__main__":
 
     
     test_bot.scan()
+
