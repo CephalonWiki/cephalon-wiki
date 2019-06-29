@@ -1,3 +1,4 @@
+import re
 from lxml import html
 import requests
 from pprint import pprint
@@ -23,7 +24,7 @@ def get_article_subsection(title, subsection):
         # If we find nothing, stick with the old logic and return the page summary
         return warframeWikiScrapper.get_article_summary(title, info = title_article_info)
 
-def get_subsection_summary(url, subsection_title):
+def get_subsection_summary(url, subsection_title = "mw-content-text"):
     CephalonWikiLogger.scrapper.info("Searching for subsection " + subsection_title + ".")
 
     # First, try to search directly by id
@@ -53,20 +54,25 @@ def get_summary_by_id(url, subsection_title):
 
     current_subsection = title_tag
     subsection_summary = ""
-    found_summary = False
+    status = None
     blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", subsection_title]
+    tag_blacklist = ["figure", "table"]
 
     while not subsection_summary:
         subsection_children = list(current_subsection.iter())
-        for t in subsection_children[subsection_children.index(title_tag):]:
-            if t.text_content().strip() not in blacklist:
+        for t in subsection_children[subsection_children.index(title_tag)+1:]:
+            if t.tag in tag_blacklist:
+                t.drop_tree()
+                status = False
+                break
+            elif t.text_content().strip() not in blacklist:
                 subsection_summary = t.text_content().strip()
-                found_summary = True
+                status = True
                 break
 
-        if found_summary:
+        if status == True:
             break
-        else:
+        elif status == None:
             current_subsection = current_subsection.getparent()
 
     return subsection_summary
@@ -80,7 +86,7 @@ def get_summary_by_title(url, subsection_title):
     for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
         try:
             #print(t.text_content().strip(), t.text_content().strip() == subsection_title)
-            if t.text_content().strip() == subsection_title:
+            if t.text_content().strip() == subsection_title or subsection_title in re.split(r"\n\n", t.text_content().strip()):
                 #print(t.text_content().strip() == subsection_title)
                 title_tag = t
                 found_title = True
@@ -106,12 +112,12 @@ def get_summary_by_title(url, subsection_title):
     while not subsection_summary:
         subsection_children = list(current_subsection.itertext())
         #print(subsection_children)
-        for t in subsection_children[subsection_children.index(title_tag.text_content().strip()) + 1:]:
+        for t in subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]:
             if t.strip() not in blacklist:
                 subsection_summary += t
                 found_summary = True
 
-                if t.endswith("\n"):
+                if t.endswith(".\n"):
                     break
 
         if found_summary:
@@ -121,17 +127,21 @@ def get_summary_by_title(url, subsection_title):
 
     return subsection_summary.strip()
 
-# test_cases = [("Mirage", "Hall of Mirrors"),
-#               ("Mirage/Abilities", "Hall of Mirrors"),
-#               ("Focus/Vazarin", "Protective Dash"),
-#               ("Vazarin", "Protective Dash"),
-#               ("Focus", "Protective Dash"),
-#               ("Ephemera", "Freezing Step"),
-#               ("Orbiter", "Landing Craft")]
-#
-# for t in test_cases:
-#     print("\n")
-#     print(t[1])
-#     print("==================")
-#     print(get_article_subsection(t[0], t[1]))
-#     print("++++++++++++++")
+if __name__ == "__main__":
+    test_cases = [("Mirage", "Hall of Mirrors"),
+                  ("Mirage/Abilities", "Hall of Mirrors"),
+                  ("Focus/Vazarin", "Protective Dash"),
+                  ("Vazarin", "Protective Dash"),
+                  ("Focus", "Protective Dash"),
+                  ("Ephemera", "Freezing Step"),
+                  ("Ephemera", "Smoking Body"),
+                  ("Orbiter", "Landing Craft"),
+                  ("Critical Hit", "Crit Tiers"),
+                  ("Fishing", "Mortus Lungfish")]
+
+    for t in test_cases:
+        pprint("\n")
+        pprint(t[1])
+        pprint("==================")
+        pprint(get_article_subsection(t[0], t[1]))
+        pprint("++++++++++++++")
