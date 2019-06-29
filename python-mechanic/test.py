@@ -15,10 +15,10 @@ if __name__ == "__main__":
                   "Lex Prime",
                   "Lex, Lex Prime",
                   "Mirage, Mirage Prime",
-                  "Vitality, Primed Vitality",
+                  "Vigor, Primed Vigor",
                   "Freezing Step",
                   "Landing Craft",
-                  "Critical Hit", #NOT FIXED:  Figure tag at top of page; moved after first paragraph
+                  "Critical Hit", #FIXED:  Missing p tag, weird capitalization
                   "Crit Tiers", #NOT FIXED:  Table tag at top of section; moved after first paragraph
                   "Mortus Lungfish"]
 

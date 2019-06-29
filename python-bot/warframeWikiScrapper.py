@@ -172,7 +172,7 @@ def get_article_summary(title, detail=True, info = None):
                 break
 
         # if we do not find an article summary from p tags, take first text paragraph
-        if article_title_mod not in article_summary:
+        if article_title_mod.lower() not in article_summary.lower():
             try:
                 paragraph = filter(lambda s: article_title_mod in s and article_title_mod != s and '×' not in s,
                                    article_tree.find('.//*[@id="mw-content-text"]').text_content().split("\n")).__next__()
