@@ -74,6 +74,8 @@ def get_summary_by_id(url, subsection_title):
             break
         elif status == None:
             current_subsection = current_subsection.getparent()
+        elif status == False:
+            status = None
 
     return subsection_summary
 
