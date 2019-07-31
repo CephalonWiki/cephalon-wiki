@@ -6,15 +6,15 @@ from pprint import pprint
 import warframeWikiScrapper
 import CephalonWikiLogger
 
-def get_article_subsection(title, subsection):
+def get_article_subsection(title, subsection= "mw-content-text"):
     title_article_info = warframeWikiScrapper.get_article_info(title)
     url_fm = "###[{2}](https://warframe.fandom.com{1}#{2})".format(title_article_info["title"], title_article_info["url"], subsection)
 
-    subsection_summary = get_subsection_summary("https://warframe.fandom.com" + title_article_info["url"], subsection)
+    subsection_summary = get_subsection_summary("https://warframe.fandom.com" + title_article_info["url"], title, subsection)
 
     if subsection_summary:
         # Text processing
-        subsection_summary = subsection_summary.strip().replace("\xa0", "")
+        subsection_summary = subsection_summary.strip().replace("\xa0", " ").replace("  ", " ")
 
         if subsection_summary.startswith("CODEX"):
             subsection_summary = subsection_summary[5:]
@@ -22,14 +22,15 @@ def get_article_subsection(title, subsection):
         return [url_fm, subsection_summary]
     else:
         # If we find nothing, stick with the old logic and return the page summary
+        CephalonWikiLogger.scrapper.warning("Fetching failed.  Searching for summary with main scrapper...")
         return warframeWikiScrapper.get_article_summary(title, info = title_article_info)
 
-def get_subsection_summary(url, subsection_title = "mw-content-text"):
+def get_subsection_summary(url, title, subsection_title):
     CephalonWikiLogger.scrapper.info("Searching for subsection " + subsection_title + ".")
 
     # First, try to search directly by id
     try:
-        if get_summary_by_id(url, subsection_title):
+        if get_summary_by_id(url, subsection_title).strip() not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("id search for " + subsection_title + " succeeded!")
             return get_summary_by_id(url, subsection_title)
     except Exception:
@@ -37,13 +38,14 @@ def get_subsection_summary(url, subsection_title = "mw-content-text"):
 
     # If that fails, try a text search by title
     try:
-        if get_summary_by_title(url, subsection_title):
+        if get_summary_by_title(url, subsection_title).strip() not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("Title search for " + subsection_title + " succeeded!")
             return get_summary_by_title(url, subsection_title)
     except Exception:
         CephalonWikiLogger.scrapper.error("Title search for " + subsection_title + " failed.")
 
     # If all else fails, return nothing
+    CephalonWikiLogger.scrapper.warning("id and title searches for " + subsection_title + " were not successful!")
     return ""
 
 
@@ -54,28 +56,26 @@ def get_summary_by_id(url, subsection_title):
 
     current_subsection = title_tag
     subsection_summary = ""
-    status = None
+    status = False
     blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", subsection_title]
-    tag_blacklist = ["figure", "table"]
+    tag_blacklist = ["figure", "table", "aside"]
 
     while not subsection_summary:
+        for r in current_subsection.getiterator(tag_blacklist):
+            r.drop_tree()
+
         subsection_children = list(current_subsection.iter())
+
         for t in subsection_children[subsection_children.index(title_tag)+1:]:
-            if t.tag in tag_blacklist:
-                t.drop_tree()
-                status = False
-                break
-            elif t.text_content().strip() not in blacklist:
+            if t.text_content().strip() not in blacklist:
                 subsection_summary = t.text_content().strip()
                 status = True
                 break
 
         if status == True:
             break
-        elif status == None:
-            current_subsection = current_subsection.getparent()
         elif status == False:
-            status = None
+            current_subsection = current_subsection.getparent()
 
     return subsection_summary
 
@@ -88,7 +88,7 @@ def get_summary_by_title(url, subsection_title):
     for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
         try:
             #print(t.text_content().strip(), t.text_content().strip() == subsection_title)
-            if t.text_content().strip() == subsection_title or subsection_title in re.split(r"\n\n", t.text_content().strip()):
+            if t.text_content().strip() == subsection_title or subsection_title in t.text_content().strip().split("\n\n"):
                 #print(t.text_content().strip() == subsection_title)
                 title_tag = t
                 found_title = True
@@ -110,10 +110,14 @@ def get_summary_by_title(url, subsection_title):
 
     # Filters to skip non-summaries
     blacklist = ["", "Edit", "Passive", "Passive, Way-Bound"]
+    tag_blacklist = ["figure", "table", "aside"]
 
     while not subsection_summary:
+        for r in current_subsection.getiterator(tag_blacklist):
+            r.drop_tree()
+
         subsection_children = list(current_subsection.itertext())
-        #print(subsection_children)
+
         for t in subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]:
             if t.strip() not in blacklist:
                 subsection_summary += t

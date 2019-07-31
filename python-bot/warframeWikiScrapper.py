@@ -42,26 +42,24 @@ def get_title(tag):
 
         # Try spell checker first
         corrected_title = spell_checker.correction(tag)
-        if corrected_title != tag and len(tag) > 2:
+        if corrected_title != tag and len(tag) > 4:
             CephalonWikiLogger.spell_checker.warning("Spell checker corrected title %s to %s", tag, corrected_title)
             return corrected_title
 
-        # Then use search suggestions to correct query
-        else:
-            suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
-            suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
-            if suggestions_dict:
-                corrected_title = suggestions_dict[0]["title"]
-                if corrected_title != tag and len(tag) > 2:
-                    CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", tag, corrected_title)
-                    return corrected_title
-                else:
-                    CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
-                    CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
-                    return tag
+        suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
+        suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
+        if suggestions_dict:
+            corrected_title = suggestions_dict[0]["title"]
+            if corrected_title != tag and len(tag) > 2:
+                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", tag, corrected_title)
+                return corrected_title
             else:
-                CephalonWikiLogger.scrapper.warning("No correction found for title %s.", tag)
+                CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
+                CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
                 return tag
+        else:
+            CephalonWikiLogger.scrapper.warning("No correction found for title %s.", tag)
+            return tag
 
 # Given an article title, searches for article on wiki
 def get_article_info(title):

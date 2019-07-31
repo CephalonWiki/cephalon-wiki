@@ -15,8 +15,7 @@ def correction(word):
     #90% of entries have length <= 21
     if len(word) > 30:
         return word
-        
-    "Most probable spelling correction for word."
+
     suggested_correction = max(candidates(word.lower()), key=P)
 
     # if we actually make a correction, return word with proper capitalization using the case_dict
