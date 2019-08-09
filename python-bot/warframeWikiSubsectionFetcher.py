@@ -30,7 +30,7 @@ def get_subsection_summary(url, title, subsection_title):
 
     # First, try to search directly by id
     try:
-        if get_summary_by_id(url, title, subsection_title).strip() not in ["", title, subsection_title]:
+        if get_summary_by_id(url, subsection_title).strip() not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("id search for " + subsection_title + " succeeded!")
             return get_summary_by_id(url, subsection_title)
     except Exception:
@@ -38,7 +38,7 @@ def get_subsection_summary(url, title, subsection_title):
 
     # If that fails, try a text search by title
     try:
-        if get_summary_by_title(url, title, subsection_title).strip() not in ["", title, subsection_title]:
+        if get_summary_by_title(url, subsection_title).strip() not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("Title search for " + subsection_title + " succeeded!")
             return get_summary_by_title(url, subsection_title)
     except Exception:
@@ -49,7 +49,7 @@ def get_subsection_summary(url, title, subsection_title):
     return ""
 
 
-def get_summary_by_id(url, title, subsection_title):
+def get_summary_by_id(url, subsection_title):
     article_tree = html.fromstring(requests.get(url).content)
 
     title_tag = article_tree.get_element_by_id(subsection_title.replace(' ', '_'))
@@ -57,7 +57,7 @@ def get_summary_by_id(url, title, subsection_title):
     current_subsection = title_tag
     subsection_summary = ""
     status = False
-    blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", title, subsection_title]
+    blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", subsection_title]
     tag_blacklist = ["figure", "table", "aside"]
 
     while not subsection_summary:
@@ -65,16 +65,6 @@ def get_summary_by_id(url, title, subsection_title):
             r.drop_tree()
 
         subsection_children = list(current_subsection.iter())
-
-        if subsection_title == 'mw-content-text':
-            for t in subsection_children[subsection_children.index(title_tag)+1:]:
-                if t.tag == 'p' and title.lower() in t.text_content().lower() and t.text_content().strip() not in blacklist:
-                    subsection_summary = t.text_content().strip()
-                    status = True
-                    break
-
-            if status == True:
-                break
 
         for t in subsection_children[subsection_children.index(title_tag)+1:]:
             if t.text_content().strip() not in blacklist:
@@ -89,25 +79,22 @@ def get_summary_by_id(url, title, subsection_title):
 
     return subsection_summary
 
-def get_summary_by_title(url, title, subsection_title):
+def get_summary_by_title(url, subsection_title):
     article_tree = html.fromstring(requests.get(url).content)
 
     # Find tag for article title
     title_tag = None
     found_title = False
-    if subsection_title != "mw-content-text":
-        for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
-            try:
-                if t.text_content().strip() == subsection_title or subsection_title in t.text_content().strip().split("\n\n"):
-                    title_tag = t
-                    found_title = True
-                    break
-            except Exception:
-                continue
-    else:
-        title_tag = article_tree.get_element_by_id("mw-content-text")
-        found_title = True
-
+    for t in article_tree.find('.//*[@id="mw-content-text"]').iter():
+        try:
+            #print(t.text_content().strip(), t.text_content().strip() == subsection_title)
+            if t.text_content().strip() == subsection_title or subsection_title in t.text_content().strip().split("\n\n"):
+                #print(t.text_content().strip() == subsection_title)
+                title_tag = t
+                found_title = True
+                break
+        except Exception:
+            continue
 
     # If we find nothing, no point in continuing
     if not found_title:
@@ -122,7 +109,7 @@ def get_summary_by_title(url, title, subsection_title):
     found_summary = False
 
     # Filters to skip non-summaries
-    blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", title, subsection_title]
+    blacklist = ["", "Edit", "Passive", "Passive, Way-Bound"]
     tag_blacklist = ["figure", "table", "aside"]
 
     while not subsection_summary:
@@ -130,13 +117,8 @@ def get_summary_by_title(url, title, subsection_title):
             r.drop_tree()
 
         subsection_children = list(current_subsection.itertext())
-        child_list = []
-        if subsection_title != "mw-content-text":
-            child_list = subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]
-        else:
-            child_list = subsection_children
 
-        for t in child_list:
+        for t in subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]:
             if t.strip() not in blacklist:
                 subsection_summary += t
                 found_summary = True
