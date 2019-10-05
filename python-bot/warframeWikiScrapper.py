@@ -40,13 +40,9 @@ def get_title(tag):
     else:
         CephalonWikiLogger.scrapper.warning("Article info not found for title %s.  Looking at variants...", tag)
 
-        # Try spell checker first
-        corrected_title = spell_checker.correction(tag)
-        if corrected_title != tag and len(tag) > 4:
-            CephalonWikiLogger.spell_checker.warning("Spell checker corrected title %s to %s", tag, corrected_title)
-            return corrected_title
-
-        suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
+        # Use search suggestions via API
+        suggestions_json = requests.get(
+            "http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
         suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
         if suggestions_dict:
             corrected_title = suggestions_dict[0]["title"]
@@ -57,6 +53,14 @@ def get_title(tag):
                 CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
                 CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
                 return tag
+
+        # Try spell checker
+        corrected_title = spell_checker.correction(tag)
+        if corrected_title != tag and len(tag) > 4:
+            CephalonWikiLogger.spell_checker.warning("Spell checker corrected title %s to %s", tag, corrected_title)
+            return corrected_title
+
+
         else:
             CephalonWikiLogger.scrapper.warning("No correction found for title %s.", tag)
             return tag

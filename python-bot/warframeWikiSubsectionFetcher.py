@@ -141,7 +141,7 @@ def get_summary_by_title(url, title, subsection_title):
                 subsection_summary += t
                 found_summary = True
 
-                if t.endswith(".\n"):
+                if t.endswith(".\n"):#?????????????
                     break
 
         if found_summary:
