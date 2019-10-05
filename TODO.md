@@ -2,6 +2,12 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
+21.8.2019
+- Review recent exception, spell-checker logs for missed requests
+- Complete upgrades on subsection fetcher
+- Unify fetcher and article summary code found in the scrapper get_info function
+- Review scrapper code
+
 21.5.2019
 - Rejuvenation comes without a stat table?
 
