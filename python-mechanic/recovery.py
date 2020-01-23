@@ -1,30 +1,50 @@
 import sys
 sys.path.append('../python-bot')
+import time
+import subprocess
 
 import RedditBotCephalonWiki
-import CephalonWikiLogger
+import articles_list
 
-recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "recovery-cephalon-wiki")
+recovery_bot = None
+reboot = 0
 
-# deprecated :(
-# get posts from last 36 hours
-# recent_posts = recovery_bot.subreddit.submissions(time.time()-1.1*86400, time.time())
+while True:
+    try:
+        # Regenerate articles list
+        articles_list.generate()
 
-post_list = [recovery_bot.subreddit.hot(), recovery_bot.subreddit.new()]
+        recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name="recovery-cephalon-wiki")
+        recovery_bot.logger.info("Reviewing comments from hot and new posts.")
 
-# aggregate comments
-comments = []
+        post_list = [recovery_bot.subreddit.hot(), recovery_bot.subreddit.new()]
+        comments = []
 
-recovery_bot.logger.info("Reviewing comments from hot and new posts.")
-for posts in post_list:    
-    for submission in posts:
-        submission.comments.replace_more(limit=0)
-        comments += list(filter(recovery_bot.should_respond, submission.comments.list()))
-        recovery_bot.logger.debug("Gathered comments from submission \"" + submission.title + "\"")
+        for posts in post_list:
+            for submission in posts:
+                submission.comments.replace_more(limit=0)
+                comments += list(filter(recovery_bot.should_respond, submission.comments.list()))
+                recovery_bot.logger.debug("Gathered comments from submission \"" + submission.title + "\"")
 
-if comments:
-    # using set as duplicate comments found in queue?
-    recovery_bot.logger.info("Found the following comments:  %s", set(comments))
-    recovery_bot.scan(set(comments))
-else:
-    recovery_bot.logger.warning("No comments found during recovery.  Terminating.")
+        if comments:
+            # using set as duplicate comments found in queue?
+            recovery_bot.logger.info("Found the following comments:  %s", set(comments))
+            recovery_bot.scan(set(comments))
+        else:
+            recovery_bot.logger.warning("No comments found during recovery.  Terminating.")
+    except KeyboardInterrupt:
+        recovery_bot.logger.debug("Interrupting...")
+        break
+    except Exception as e:
+        recovery_bot.logger.error("Exception raised:  " + str(e))
+
+        if reboot < 5:
+            reboot += 1
+            recovery_bot.logger.debug("%s retries attempted.", reboot)
+
+            # take a nap and start again
+            recovery_bot.logger.debug("Napping...")
+            time.sleep(30)
+        else:
+            recovery_bot.logger.error("Five retries attempted.  Rebooting...")
+            subprocess.run('reboot')

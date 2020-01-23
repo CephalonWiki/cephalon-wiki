@@ -90,7 +90,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 summary_details = warframeWikiItemComparer.compare_items(map(lambda tag: warframeWikiScrapper.get_title(tag), tag.split(",")))
 
                 if not summary_details:
-                    self.logger.info("Comparison retrieval failed.  Routing list of articles to scrapper module.")
+                    self.logger.info("Comparison retrieval failed.  Routing list of articles_dict to scrapper module.")
                     summary_details = sum(map(lambda tag: warframeWikiScrapper.get_article_summary(tag), tag.split(",")), [])
 
             else:

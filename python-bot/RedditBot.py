@@ -1,8 +1,5 @@
-import datetime
 import time
-import traceback
 import logging
-import subprocess
 
 class RedditBot:
 

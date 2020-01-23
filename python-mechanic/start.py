@@ -1,8 +1,10 @@
 import time
 import subprocess
+import os
 import sys
 sys.path.append('../python-bot')
 
+import articles_list
 import RedditBotCephalonWiki
 
 reboot = 0
@@ -10,6 +12,9 @@ wiki_bot = None
 
 while True:
     try:
+        if not os.path.isfile("../../data/articles.csv"):
+            articles_list.generate()
+
         wiki_bot = RedditBotCephalonWiki.RedditBotCephalonWiki()
         wiki_bot.scan()
     except KeyboardInterrupt:

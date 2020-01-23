@@ -2,9 +2,10 @@
 
 import string
 from collections import Counter
-from articles_list import articles_dict as articles
+import articles_list
 
 # will use lower case words for the dictionary
+articles = articles_list.load()
 WORDS = Counter(articles.keys())
 
 def P(word, N=sum(WORDS.values())):
@@ -12,7 +13,7 @@ def P(word, N=sum(WORDS.values())):
     return WORDS[word] / N
 
 def correction(word):
-    #90% of entries have length <= 21
+    #90% of entries have length <= 2/1
     if len(word) > 30:
         return word
 

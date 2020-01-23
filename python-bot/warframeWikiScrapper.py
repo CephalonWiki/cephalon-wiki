@@ -4,13 +4,14 @@ import requests
 import json
 from lxml import html
 
-from articles_list import articles_dict as articles
+import articles_list
 import spell_checker
 
 import tagParser
 
 import CephalonWikiLogger
 
+articles = articles_list.load()
 
 def format_polarity(mod_polarity):
     polarity_letter = ""
@@ -51,7 +52,7 @@ def get_title(tag):
                 return corrected_title
             else:
                 CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
-                CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
+                CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles_dict.", tag)
                 return tag
 
         # Try spell checker
@@ -148,7 +149,7 @@ def get_article_summary(title, detail=True, info = None):
     else:
         article_info = get_article_info(title)
 
-    if article_info["id"] > 0:
+    if int(article_info["id"]) > 0:
 
         # formatting for reddit comment
         url_fm = "###[{0}](https://warframe.fandom.com{1})".format(article_info["title"], article_info["url"])
