@@ -30,17 +30,21 @@ def get_subsection_summary(url, title, subsection_title):
 
     # First, try to search directly by id
     try:
-        if get_summary_by_id(url, title, subsection_title).strip() not in ["", title, subsection_title]:
+        id_summary = get_summary_by_id(url, title, subsection_title).strip()
+        if id_summary not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("id search for " + subsection_title + " succeeded!")
-            return get_summary_by_id(url, subsection_title)
+            CephalonWikiLogger.scrapper.info(id_summary)
+            return id_summary
     except Exception:
         CephalonWikiLogger.scrapper.error("id search for " + subsection_title + " failed.")
 
     # If that fails, try a text search by title
     try:
-        if get_summary_by_title(url, title, subsection_title).strip() not in ["", title, subsection_title]:
+        title_summary = get_summary_by_title(url, title, subsection_title).strip()
+        if title_summary not in ["", title, subsection_title]:
             CephalonWikiLogger.scrapper.info("Title search for " + subsection_title + " succeeded!")
-            return get_summary_by_title(url, subsection_title)
+            CephalonWikiLogger.scrapper.info(title_summary)
+            return title_summary
     except Exception:
         CephalonWikiLogger.scrapper.error("Title search for " + subsection_title + " failed.")
 
