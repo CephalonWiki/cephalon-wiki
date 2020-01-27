@@ -1,3 +1,4 @@
+import traceback
 import time
 import subprocess
 import os
@@ -21,6 +22,7 @@ while True:
         wiki_bot.logger.debug("Interrupting...")
         break
     except Exception as e:
+        wiki_bot.logger.error(traceback.format_exc())
         wiki_bot.logger.error("Exception raised:  " + str(e))
 
         if reboot < 5:

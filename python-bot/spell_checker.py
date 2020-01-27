@@ -2,7 +2,10 @@
 
 import string
 from collections import Counter
+
 import articles_list
+from CephalonWikiLogger import spell_checker
+
 
 # will use lower case words for the dictionary
 articles = articles_list.load()
@@ -13,20 +16,19 @@ def P(word, N=sum(WORDS.values())):
     return WORDS[word] / N
 
 def correction(word):
-    #90% of entries have length <= 2/1
+    #90% of entries have length <= 21
     if len(word) > 30:
         return word
 
     suggested_correction = max(candidates(word.lower()), key=P)
 
-    # if we actually make a correction, return word with proper capitalization using the case_dict
-    if suggested_correction != word:
-        if suggested_correction in articles:
-            return articles[suggested_correction]['title']
-        else:
-            return suggested_correction.title()
+    # if we actually make a correction, return title from dictionary
+    if suggested_correction != word.lower():
+        spell_checker.info("Spell checker corrected %s to %s", word.lower(), suggested_correction)
+        return articles[suggested_correction]['title']
     else:
-        return suggested_correction
+        spell_checker.info("No correction made for %s", word)
+        return word
 
 def candidates(word):
     "Generate possible spelling corrections for word."

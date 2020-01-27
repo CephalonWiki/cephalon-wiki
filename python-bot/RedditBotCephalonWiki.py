@@ -57,11 +57,16 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             # Given updates to reply author code, blacklist should not be necessary
             no_blacklist = str(comment) not in ['e7fnpxb', 'e5d8sl2']
 
+            # No replying to deleted comments!
+
             if not human_author:
                 self.logger.debug("Comment authored by CephalonWiki")
                 return False
             elif not no_blacklist:
-                self.logger.error("Attempted to reply to blacklisted comment %s", comment)
+                self.logger.warning("Comment %s is blacklisted", comment)
+                return False
+            elif comment.author in ['[deleted]', '[removed]']:
+                self.logger.warning("Comment %s is Deleted or Removed", comment)
                 return False
             else:
                 # Now that the comment is human-authored and contains matching braces...
@@ -130,5 +135,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
 
             return article_summaries
         except Exception as e:
+            self.logger.error(traceback.format_exc())
             self.logger.error("No response to comment %s", comment)
             return ""
