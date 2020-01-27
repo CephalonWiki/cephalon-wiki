@@ -1,5 +1,8 @@
+import traceback
 import time
 import logging
+
+import praw
 
 class RedditBot:
 
@@ -64,8 +67,12 @@ class RedditBot:
             for s in response.strip().split("\n"):
                 self.logger.info(s)
 
-            comment.reply(self.header + response + self.footer)
-            self.logger.info("Response posted to Reddit.")
+            try:
+                comment.reply(self.header + response + self.footer)
+                self.logger.info("Response posted to Reddit.")
+            except praw.exceptions.APIException:
+                self.logger.error(traceback.format_exc())
+                self.logger.error("Reddit API exception raised.  Unable to reply to comment %s", comment)
 
     def scan(self, stream = None):
         # Stream set-up
@@ -87,4 +94,5 @@ class RedditBot:
                 self.logger.debug("Waiting %s seconds to respond to comment %s", nap_time, comment)
                 time.sleep(nap_time)
 
-                self.respond(comment)
+                if self.should_respond(comment):
+                    self.respond(comment)

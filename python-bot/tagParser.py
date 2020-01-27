@@ -1,3 +1,5 @@
+from CephalonWikiLogger import cephalon
+
 # delimiters
 detailed_delimiters = ["{{", "}}"]
 simple_delimiters = ["{", "}"]
@@ -34,9 +36,27 @@ def get_tags(comment_string, open_del, close_del):
 def format_comment(comment_string):
     comment_paragraphs = comment_string.split("\n\n")
 
-    # do not search for tags in quoted comments
-    comment_content = "\n\n".join(filter(lambda s: not(s.strip().startswith(">")), comment_paragraphs))
+    for p in comment_paragraphs:
+        if p.strip().startswith(">"):
+            cephalon.warning("Ignoring paragraph in comment.  Reply Block:  " + p.replace("\n", "\t"))
+            comment_paragraphs.remove(p)
+        else:
+            lines = p.split("\n")
+            is_code = False
+            for l in lines:
+                if l.startswith("    "):
+                    is_code = True
+                    continue
+                else:
+                    # not a code block
+                    is_code = False
+                    break
 
+            if is_code:
+                cephalon.warning("Ignoring paragraph in comment.  Indented Block:  " + p.replace("\n", "\t"))
+                comment_paragraphs.remove(p)
+
+    comment_content = "\n\n".join(comment_paragraphs)
     return comment_content.lower().title().replace("And", "and").replace("Of","of").strip()
 
 
