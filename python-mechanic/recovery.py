@@ -7,6 +7,7 @@ import RedditBotCephalonWiki
 import articles_list
 
 recovery_bot = None
+reboot = 0
 
 try:
     # Regenerate articles list
@@ -32,3 +33,5 @@ try:
         recovery_bot.logger.warning("No comments found during recovery.  Terminating.")
 except KeyboardInterrupt:
     recovery_bot.logger.debug("Interrupting...")
+except Exception as e:
+    recovery_bot.logger.error("Exception raised:  " + str(e))
