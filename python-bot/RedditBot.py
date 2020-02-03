@@ -61,7 +61,7 @@ class RedditBot:
         self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
 
         # preparing response using the module
-        response = self.response(comment)
+        response = self.response(comment.body)
         if response:
             self.logger.info("Comment response:")
             for s in response.strip().split("\n"):
