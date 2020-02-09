@@ -1,24 +1,50 @@
 import traceback
+import random
 
 import praw
 
 import RedditBot
-
 import CephalonWikiLogger
 
 import tagParser
 
+import articles_list
 import warframeWikiScrapper
 import warframeWikiItemComparer
 import warframeWikiSubsectionFetcher
 
-import random
-
-# For responding to comments
-header = "Hello Tenno.  Here is the information you requested.\n"
-footer = "\n\n*****\n\n Want a summary of a subsection?  Try {Vazarin#Protective Dash} or {Fishing#Mortus Lungfish} | [Github](https://github.com/CephalonWiki/cephalon-wiki) | [Subreddit](/r/CephalonWiki) | "
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
+
+    articles = articles_list.load()
+
+    # For responding to comments
+    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n"
+    cephalon_footer = "\n\n*****\n\n" \
+             "Still curious?  Reply with {!about} or {!commands} to learn more. | " \
+             "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
+             "[Subreddit](/r/CephalonWiki) | "
+
+    # For !about
+    about = "###!about\n\n" \
+            "I read and respond to comments on /r/Warframe with information from " \
+            "[warframe.fandom.com](https://warframe.fandom.com/wiki/WARFRAME_Wiki).\n" \
+            "* I only respond to comments that contain matching curly brackets \{ \}.\n" \
+            "* Any text found between brackets is used to query the wiki, up to 10 queries at maximum.\n" \
+            "* I ignore queries found in code/indented blocks and quotes.\n" \
+            "* If I cannot lookup your query directly on the wiki, I will attempt to match it against the available article titles " \
+            "(spell checking), or otherwise use the wiki's search function.\n\n" \
+            "I am built using [Python 3.6](https://github.com/CephalonWiki/cephalon-wiki/tree/master/python-bot), I live inside a Raspberry Pi Zero, and I run on [shell+Python scripts](https://github.com/CephalonWiki/cephalon-wiki/tree/master/python-mechanic).\n\n" \
+            "Send feedback to /u/1st_transit_of_venus" \
+
+    # For !commands
+    commands = "###!commands\n\n"\
+               "There are three ways to query information from [warframe.fandom.com](https://warframe.fandom.com/wiki/WARFRAME_Wiki), all using curly brackets \{ \}.\n"\
+               "* To see an article summary, bracket any query as in {Ivara Prime} or {Sonicor}.\n" \
+               "* To see a table of item statistics, bracket a comma-separated list as in {Nikana, Nikana Prime, Dragon Nikana} or {Hildryn, Rhino}.\n" \
+               "* To see a summary of a section of an article, bracket the main article, a hash \#, and the subsection as in {Naramon#Power Spike}.\n\n" \
+               "Other commands to try:  {!random} returns a random article summary\n\n" \
+
 
     def __init__(self, name="cephalon-wiki", subreddit="warframe"):
 
@@ -38,9 +64,8 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_mechanic("1st_transit_of_venus")
 
         # for responding to messages
-        super().set_header(header)
-        super().set_footer(footer)
-
+        super().set_header(self.cephalon_header)
+        super().set_footer(self.cephalon_footer)
 
     # clean up the nested ifs yuck
     def should_respond(self, comment):
@@ -57,11 +82,16 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             # Given updates to reply author code, blacklist should not be necessary
             no_blacklist = str(comment) not in ['e7fnpxb', 'e5d8sl2']
 
+            # No replying to deleted comments!
+
             if not human_author:
                 self.logger.debug("Comment authored by CephalonWiki")
                 return False
             elif not no_blacklist:
-                self.logger.error("Attempted to reply to blacklisted comment %s", comment)
+                self.logger.warning("Comment %s is blacklisted", comment)
+                return False
+            elif comment.author in ['[deleted]', '[removed]']:
+                self.logger.warning("Comment %s is Deleted or Removed", comment)
                 return False
             else:
                 # Now that the comment is human-authored and contains matching braces...
@@ -85,14 +115,33 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
     def format_article_summary(self, tag, detail=False):
         try:
             summary_details = ""
-            if "," in tag:
+
+            # Commands module
+            if tag.startswith("!"):
+                if tag == "!about":
+                    self.logger.info("About information requested.")
+                    summary_details = [self.about]
+                if tag == "!commands":
+                    self.logger.info("Command information requested.")
+                    summary_details = [self.commands]
+                elif tag == "!random":
+                    self.logger.info("Random article requested.")
+                    random_article = random.sample(self.articles.keys(), 1)[0]
+                    return self.format_article_summary(random_article).replace("###", "###!random ")
+                elif tag == "!test":
+                    self.logger.info("Test requested.")
+                    return self.response(self.commands)
+
+            # Comparison module
+            elif "," in tag:
                 self.logger.info("Routing to Item Comparison module.")
                 summary_details = warframeWikiItemComparer.compare_items(map(lambda tag: warframeWikiScrapper.get_title(tag), tag.split(",")))
 
                 if not summary_details:
-                    self.logger.info("Comparison retrieval failed.  Routing list of articles to scrapper module.")
+                    self.logger.info("Comparison retrieval failed.  Routing list of articles_dict to scrapper module.")
                     summary_details = sum(map(lambda tag: warframeWikiScrapper.get_article_summary(tag), tag.split(",")), [])
 
+            # Scrappers:  Main, Subsection
             else:
                 title = ""
                 redirected_title = warframeWikiScrapper.get_article_info(tag)["title"]
@@ -123,12 +172,13 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 self.logger.error("No details retrieved for tag %s", tag)
                 return ""
 
-    def response(self, comment):
+    def response(self, comment_string):
         try:
-            article_tags = tagParser.get_tagged_articles(comment.body)
-            article_summaries = "\n".join(map(lambda p: self.format_article_summary(*p), article_tags)).strip()
+            article_tags = tagParser.get_tagged_articles(comment_string)
+            article_summaries = "\n".join(map(lambda p: self.format_article_summary(p), article_tags)).strip()
 
             return article_summaries
         except Exception as e:
-            self.logger.error("No response to comment %s", comment)
+            self.logger.error(traceback.format_exc())
+            self.logger.error("No response to comment.")
             return ""

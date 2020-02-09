@@ -4,13 +4,14 @@ import requests
 import json
 from lxml import html
 
-from articles_list import articles_dict as articles
+import articles_list
 import spell_checker
 
 import tagParser
 
-import CephalonWikiLogger
+from CephalonWikiLogger import scrapper
 
+articles = articles_list.load()
 
 def format_polarity(mod_polarity):
     polarity_letter = ""
@@ -34,39 +35,41 @@ def get_title(tag):
 
     # Pass along if title is known
     if tag.lower() in articles:
-        CephalonWikiLogger.scrapper.info("Article %s present in dictionary.", tag)
+        scrapper.info("Article %s present in dictionary.", tag)
         return tag
     # Attempt to lookup article otherwise
     else:
-        CephalonWikiLogger.scrapper.warning("Article info not found for title %s.  Looking at variants...", tag)
+        scrapper.warning("Article info not found for title %s.  Looking at variants...", tag)
 
-        # Try spell checker first
-        corrected_title = spell_checker.correction(tag)
-        if corrected_title != tag and len(tag) > 4:
-            CephalonWikiLogger.spell_checker.warning("Spell checker corrected title %s to %s", tag, corrected_title)
-            return corrected_title
-
-        suggestions_json = requests.get("http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
+        # Use search suggestions via API
+        suggestions_json = requests.get(
+            "http://warframe.wikia.com/api/v1/SearchSuggestions/List?query=" + tag.replace(" ", "_"))
         suggestions_dict = json.loads(suggestions_json.content.decode('utf-8'))["items"]
         if suggestions_dict:
             corrected_title = suggestions_dict[0]["title"]
             if corrected_title != tag and len(tag) > 2:
-                CephalonWikiLogger.spell_checker.warning("Search suggestion corrected %s to %s", tag, corrected_title)
+                scrapper.warning("Search suggestion corrected %s to %s", tag, corrected_title)
                 return corrected_title
             else:
-                CephalonWikiLogger.spell_checker.warning("Search suggestion found article %s.", corrected_title)
-                CephalonWikiLogger.spell_checker.warning("%s is not in the list of articles.", tag)
+                scrapper.warning("Search suggestion found article %s.", corrected_title)
+                scrapper.warning("%s is not in the list of articles_dict.", tag)
                 return tag
+
+        # Try spell checker
+        corrected_title = spell_checker.correction(tag)
+        if corrected_title != tag and len(tag) > 4:
+            return corrected_title
         else:
-            CephalonWikiLogger.scrapper.warning("No correction found for title %s.", tag)
+            scrapper.warning("No correction found for title %s.", tag)
             return tag
 
 # Given an article title, searches for article on wiki
 def get_article_info(title):
-    CephalonWikiLogger.scrapper.info("Looking up info on title %s.", title)
+    scrapper.info("Looking up info on title %s.", title)
 
     article_info = {'id': -1, 'title': ''}
-    if title.lower() in articles: #pre-computed article info
+    if title.lower() in articles: #pre-computed article info.
+        scrapper.info("%s present in dictionary.", title)
         article_info = articles[title.lower()]
 
         # correction for primes
@@ -85,10 +88,10 @@ def get_article_info(title):
         if article_info["id"] == -1:
             article_info["id"] = int(list(article_dict.keys())[0])
     except KeyError as e:
-        CephalonWikiLogger.scrapper.error("KeyError: with " + str(e) + " for title " + title)
+        scrapper.error("KeyError: with " + str(e) + " for title " + title)
         return article_info
     except:
-        CephalonWikiLogger.scrapper.error("Look-up failed for title " + title)
+        scrapper.error("Look-up failed for title " + title)
         return article_info
 
 
@@ -100,7 +103,7 @@ def get_article_info(title):
         article_dump = article_dict[str(article_info["id"])]["revisions"][0]['*'].strip()
         if article_dump.lower().startswith("#redirect"):
             redirected_title = article_dump[article_dump.index("[[") + 2:article_dump.index("]]")]
-            CephalonWikiLogger.scrapper.info("Redirecting to %s.", redirected_title)
+            scrapper.info("Redirecting to %s.", redirected_title)
             return get_article_info(redirected_title)
         else:
             article_tags = tagParser.get_tags(article_dump, "{{", "}}")
@@ -128,7 +131,7 @@ def get_article_info(title):
                     article_type = "Sentinel"
                     break
     except KeyError as e:
-        CephalonWikiLogger.scrapper.error("KeyError: with " + str(e) + " for title " + title)
+        scrapper.error("KeyError: with " + str(e) + " for title " + title)
 
     # Assemble look up information into dictionary
     article_info["type"] = article_type
@@ -144,7 +147,7 @@ def get_article_summary(title, detail=True, info = None):
     else:
         article_info = get_article_info(title)
 
-    if article_info["id"] > 0:
+    if int(article_info["id"]) > 0:
 
         # formatting for reddit comment
         url_fm = "###[{0}](https://warframe.fandom.com{1})".format(article_info["title"], article_info["url"])
@@ -166,7 +169,7 @@ def get_article_summary(title, detail=True, info = None):
                     i.text = i.get('alt').replace(' Pol', '')
 
                 article_summary = p.text_content().strip().replace("\xa0", " ")
-                CephalonWikiLogger.scrapper.debug(article_summary)
+                scrapper.debug(article_summary)
                 break
 
         # if we do not find an article summary from p tags, take first text paragraph
@@ -177,7 +180,7 @@ def get_article_summary(title, detail=True, info = None):
                 article_summary = paragraph.strip().replace("\xa0", "")
             except Exception:
                 article_summary = "Sorry, no summary is availablebleblebleble... Hmm... I will attempt to bypass this fault."
-                CephalonWikiLogger.scrapper.error("No summary available for %s", article_info["title"])
+                scrapper.error("No summary available for %s", article_info["title"])
 
         #
         # processing for the aside
@@ -215,7 +218,7 @@ def get_article_summary(title, detail=True, info = None):
             try:
                 aside_filter = aside_filters[article_info["type"]]
             except KeyError as e:
-                CephalonWikiLogger.scrapper.error("KeyError " + str(e) + " with title " + title + " and type " + article_info["type"])
+                scrapper.error("KeyError " + str(e) + " with title " + title + " and type " + article_info["type"])
 
             current_subheader = None
             aside_sections = list(itertools.chain(*map(lambda tag: tag.getchildren(), article_aside.findall('./section'))))

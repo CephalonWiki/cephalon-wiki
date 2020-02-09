@@ -2,10 +2,19 @@
 
 Will be updated with ongoing goals, tasks, updates, etc.
 
-24.1.2018
+21.8.2019
+- Review recent exception, spell-checker logs for missed requests
+- Complete upgrades on subsection fetcher
+- Unify fetcher and article summary code found in the scrapper get_info function
+- Review scrapper code
+
+21.5.2019
+- Rejuvenation comes without a stat table?
+
+24.1.2019
 - Article for neurodes is missing <p> tag, leading to incorrect summary retrieved.
 
-18.1.2018
+18.1.2019
 - Add short hand syntax for amp parts, eg {323}, and investigate scrapping from https://semlar.com/ampcalc/323
 + Cleaned up vorologue spam
 

@@ -69,7 +69,7 @@ warning_log.addFilter(LevelFilter([logging.WARNING]))
 # Add formatters to handlers #
 ##############################
 
-formatter = logging.Formatter('%(asctime)s - %(name)22s - %(funcName)20s -  %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(levelname)10s - %(name)22s - %(funcName)22s - %(lineno)4d - %(message)s')
 
 # all files have the same format
 console.setFormatter(formatter)
