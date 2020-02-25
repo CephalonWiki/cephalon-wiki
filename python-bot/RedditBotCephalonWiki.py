@@ -8,7 +8,7 @@ import CephalonWikiLogger
 
 import tagParser
 
-import articles_list
+import warframeWikiArticles
 import warframeWikiScrapper
 import warframeWikiItemComparer
 import warframeWikiSubsectionFetcher
@@ -16,7 +16,7 @@ import warframeWikiSubsectionFetcher
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
-    articles = articles_list.load()
+    articles = warframeWikiArticles.load()
 
     # For responding to comments
     cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n"

@@ -21,6 +21,7 @@ comparison.setLevel(logging.DEBUG)
 spell_checker = logging.getLogger('spell_checker')
 spell_checker.setLevel(logging.DEBUG)
 
+loggers = [cephalon, scrapper, comparison, spell_checker]
 
 ############
 # handlers #

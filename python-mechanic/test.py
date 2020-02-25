@@ -4,13 +4,17 @@ args = sys.argv
 
 from pprint import pprint
 
+import CephalonWikiLogger
 import RedditBotCephalonWiki
+import logging
 
 
-test_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name = "test-cephalon-wiki", subreddit = "cephalonwiki")
+test_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name="test-cephalon-wiki", subreddit="cephalonwiki")
 
 if __name__ == "__main__":
     if "full" in args:
+        for l in CephalonWikiLogger.loggers:
+            l.setLevel(logging.WARNING)
         test_cases = ["Mirage",
                       "Hall of Mirrors",
                       "Vazarin",  # FIXED:  redirects with "Focus/Vazarin" to scrapper
@@ -31,6 +35,9 @@ if __name__ == "__main__":
             pprint("==================")
             pprint(test_bot.format_article_summary(t))
             pprint("++++++++++++++")
+
+        for l in CephalonWikiLogger.loggers:
+            l.setLevel(logging.DEBUG)
 
     test_bot.scan()
 

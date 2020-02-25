@@ -1,12 +1,9 @@
-import re
-from lxml import html
 import requests
+from lxml import html
 
-import warframeWikiScrapper
-
-
-from CephalonWikiLogger import scrapper
 import CephalonWikiLogger
+import warframeWikiScrapper
+from CephalonWikiLogger import scrapper
 
 
 def get_article_subsection(title, subsection= "mw-content-text"):
@@ -62,7 +59,6 @@ def get_summary_by_id(url, title, subsection_id="mw-content-text"):
     article_tree = html.fromstring(requests.get(url).content)
 
     # Start search from tag with id specified in method call
-    current_subsection = [];
     try:
         current_subsection = article_tree.get_element_by_id(subsection_id.replace(' ', '_'))
     except Exception:
@@ -144,10 +140,9 @@ def get_summary_by_title(url, title, subsection_title):
         title_tag = article_tree.get_element_by_id("mw-content-text")
         found_title = True
 
-
     # If we find nothing, no point in continuing
     if not found_title:
-        #scrapper.info("Title not found")
+        # scrapper.info("Title not found")
         return ""
 
     # Will start looking one level above the title.  We consider all children occurring after the title,
@@ -166,7 +161,6 @@ def get_summary_by_title(url, title, subsection_title):
             r.drop_tree()
 
         subsection_children = list(current_subsection.itertext())
-        child_list = []
         if subsection_title != "mw-content-text":
             child_list = subsection_children[subsection_children.index(title_tag.text_content().strip())+1:]
         else:
@@ -186,6 +180,7 @@ def get_summary_by_title(url, title, subsection_title):
             current_subsection = current_subsection.getparent()
 
     return subsection_summary.strip()
+
 
 if __name__ == "__main__":
     test_cases = [("Mirage", "Hall of Mirrors"),
