@@ -1,7 +1,9 @@
 # cephalon-wiki
 Python and Shell Scripts for running and maintaining the /r/Warframe wiki bot
 
-## Using
+## Operating
+Shell scripts for operating the bot can be found in the shell-mechanic directory.  All of these scripts create a tmux session and run an associated python file from the python-mechanic directory.
+
 1. **Start**:  The bot can be started by navigating to the shell-mechanic directory and running start.sh.  This script runs a python script which creates a tmux session, a RedditBotCephalonWiki instance, and calls the scan() method of that object.  scan() reads comments from /r/Warframe in the order in which they are posted, continuously.
 
 2. **Recovery**:  To re-scan previously submitted and scanned comments, recovery.sh creates a separate tmux session, separate RedditBotCephalonWiki instance, and scans comments submitted to /r/Warframe over the last week.  
@@ -9,7 +11,7 @@ Python and Shell Scripts for running and maintaining the /r/Warframe wiki bot
 3. **Test**:  Runs unit tests on a sample of article titles.
 
 ## Structure
-The python code for the bot can be organized into three blocks:
+The main python source code can be found in the python-bot directory.  The sources are organized into three blocks:
 
 1.  **Reddit Block**:  Via the Python Reddit API, retrieves and posts comments on /r/Warframe.
 	* **RedditBot**:  A generic reddit comment bot.  It can be used by creating a child class and overridding the should_respond(comment) and response(comment) methods.
