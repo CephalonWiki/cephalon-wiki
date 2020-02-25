@@ -12,14 +12,16 @@ The python code for the bot can be organized into three blocks:
 1.  **Reddit Block**:  Via the Python Reddit API, retrieves and posts comments on /r/Warframe.
 	* **RedditBot**:  A generic reddit comment bot.  It can be used by creating a child class and overridding the should_respond(comment) and response(comment) methods.
 	* **RedditBotCephalonWiki**:  Child class of RedditBot.  Reddit comments are passed to the Text Block to obtain the requested article names, and the article names are passed to the Wiki Block to obtain article information.
+	* **RedditBotCephalonWikiInbox**:  Child class of RedditBotCephalonWiki that responds to inbox messages.
 
-2.  **Text Block**:  Text processing for reddit comments.
+2.  **Tag Block**:  Text processing for curly-bracket-delimited tags in reddit comments.
 	* **tagParser**:  Cleans reddit comments (eg. removes quoted text) and finds tags/requested article names based on given delimiters.
-	* **spell_checker**:  A basic spelling correction program for common, small mistakes in item names.
-	* **all_articles**:  Dictionary of article information and list of article titles used in spell_checker module.
+	* **tagSpellChecker**:  A basic spelling correction program for common, small mistakes in item names.
 
 3.  **Wiki Block**:  Scrapper for http://warframe.wikia.com/
-	* **warframeWikiScrapper**:  Two main methods that lookup an article and scrape it based on item type.
+	* **warframeWikiArticles**:  On start, the bot generates and loads a dictionary of basic article information, including id, title, and local url.  
+	* **warframeWikiScrapper**:  Two main methods that look-up an article and scrape it based on item type.
 	* **warframeWikiItemComparer**:  Calls the scrapper module to compare two items of the same type.
+	* **warframeWikiSubsectionFetcher**:  More advanced methods for obtaining article summaries.  
 
 The Text and Wiki blocks are independent, and the Reddit block imports and calls methods from both blocks.
