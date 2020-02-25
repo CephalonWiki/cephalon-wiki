@@ -6,6 +6,8 @@ Python and Shell Scripts for running and maintaining the /r/Warframe wiki bot
 
 2. **Recovery**:  To re-scan previously submitted and scanned comments, recovery.sh creates a separate tmux session, separate RedditBotCephalonWiki instance, and scans comments submitted to /r/Warframe over the last week.  
 
+3. **Test**:  Runs unit tests on a sample of article titles.
+
 ## Structure
 The python code for the bot can be organized into three blocks:
 
