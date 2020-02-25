@@ -1,6 +1,11 @@
-#To Dos
+**To Dos**
 
 Will be updated with ongoing goals, tasks, updates, etc.
+
+25.2.2020
+- Expand mod retrieval to return mod drop location
+- Expand unit tests
+- Figure out what the heck to do with the subsection fetcher
 
 21.8.2019
 - Review recent exception, spell-checker logs for missed requests
