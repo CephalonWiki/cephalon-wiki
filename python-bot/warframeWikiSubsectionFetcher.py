@@ -8,7 +8,7 @@ from CephalonWikiLogger import scrapper
 
 def get_article_subsection(title, subsection= "mw-content-text"):
     title_article_info = warframeWikiScrapper.get_article_info(title)
-    url_fm = "###[{2}](https://warframe.fandom.com{1}#{2})".format(title_article_info["title"], title_article_info["url"], subsection)
+    url_fm = "###[{0}](https://warframe.fandom.com{1}#{2})".format(subsection.replace("_", " "), title_article_info["url"], subsection.replace(" ", "_"))
 
     subsection_summary = get_subsection_summary("https://warframe.fandom.com" + title_article_info["url"], title, subsection)
 
@@ -72,7 +72,6 @@ def get_summary_by_id(url, title, subsection_id="mw-content-text"):
     string_blacklist = ["", "Edit", "Passive", "Passive, Way-Bound", "CODEX", title, subsection_id]
     tag_blacklist = ["figure", "table", "aside"]
     class_blacklist = ["codexflower", "cquote", "warframeNavBox"]
-    element_blacklist = [];
 
     # Main loop
     while not found_summary:
@@ -81,7 +80,9 @@ def get_summary_by_id(url, title, subsection_id="mw-content-text"):
         # Drop extraneous tags
         if current_subsection.tag in tag_blacklist or current_subsection.get("class") in class_blacklist:
             scrapper.info("Current subsection in blacklist.  Moving up one level.")
+            last_subsection = current_subsection
             current_subsection = current_subsection.getparent()
+            last_subsection.drop_tree()
             continue
 
         for r in current_subsection.getiterator(tag_blacklist):
@@ -108,8 +109,9 @@ def get_summary_by_id(url, title, subsection_id="mw-content-text"):
 
         if not found_summary:
             scrapper.info("No summary found.  Moving up one level.")
-            element_blacklist.append(current_subsection)
+            last_subsection = current_subsection
             current_subsection = current_subsection.getparent()
+            last_subsection.drop_tree()
 
     return subsection_summary
 
@@ -194,7 +196,7 @@ if __name__ == "__main__":
                   ("Critical Hit", "Crit Tiers"),
                   ("Fishing", "Mortus Lungfish")]
 
-    scrapper.setLevel(CephalonWikiLogger.logging.WARNING)
+    scrapper.setLevel(CephalonWikiLogger.logging.INFO)
     for t in test_cases:
         scrapper.warning("{}:  {}".format(t[0], t[1]))
         scrapper.warning(get_article_subsection(t[0], t[1]))
