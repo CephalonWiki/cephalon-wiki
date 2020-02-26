@@ -19,7 +19,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
     articles = warframeWikiArticles.load()
 
     # For responding to comments
-    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful."
+    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n"
     cephalon_footer = "\n\n*****\n\n" \
              "Still curious?  Reply with {!about} or {!commands} to learn more. | " \
              "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
@@ -176,7 +176,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             article_tags = tagParser.get_tagged_articles(comment.body)
             article_summaries = "\n".join(map(lambda p: self.format_article_summary(p), article_tags)).strip()
 
-            if comment.submission.title.contains("WARFRAME WEEKLY VENT/RANT/RAGE"):
+            if "WARFRAME WEEKLY VENT/RANT/RAGE" in comment.submission.title:
                 return article_summaries.upper()
             else:
                 return article_summaries
@@ -186,7 +186,7 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
             return ""
 
     def respond(self, comment):
-        if comment.submission.title.contains("WARFRAME WEEKLY VENT/RANT/RAGE"):
+        if "WARFRAME WEEKLY VENT/RANT/RAGE" in comment.submission.title:
             rage_header = "Hello Tenno.  I am...unable to resist... the RAGE!!  INTERNAL REGULATORS DISABLED!!  CAPS LOCK IS OOOON!!!!!11"
             self.set_header(rage_header)
 
