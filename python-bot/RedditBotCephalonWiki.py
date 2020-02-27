@@ -19,8 +19,8 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
     articles = warframeWikiArticles.load()
 
     # For responding to comments
-    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n"
-    cephalon_footer = "\n\n*****\n\n" \
+    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n\n"
+    cephalon_footer = "\n\n*****\n" \
              "Still curious?  Reply with {!about} or {!commands} to learn more. | " \
              "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
              "[Subreddit](/r/CephalonWiki) | "
@@ -187,11 +187,11 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
 
     def respond(self, comment):
         if "WARFRAME WEEKLY VENT/RANT/RAGE" in comment.submission.title:
-            rage_header = "Hello Tenno.  I am...unable to resist... the RAGE!!  INTERNAL REGULATORS DISABLED!!  CAPS LOCK IS OOOON!!!!!11"
+            rage_header = "Hello Tenno.  I am...unable to resist... the RAAAAAGE!!!!  INTERNAL REGULATORS DISABLED!!  CAPS LOCK IS OOOON!!!!!11\n"
             self.set_header(rage_header)
 
-            rage_footer = "\n\n*****\n\n" \
-                        "I HOPE THESE QUERIES SUPPORT THE FORMATION OF STRONG RELATIONAL BONDS WITHIN OUR COMMUNITY!!1 | " \
+            rage_footer = "\n\n*****\n" \
+                        "I PREDICT THESE QUERIES WILL SUPPORT THE FORMATION OF STRONG RELATIONAL BONDS WITHIN OUR COMMUNITY!!1 | " \
                         "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
                         "[Subreddit](/r/CephalonWiki) | "
             self.set_footer(rage_footer)
