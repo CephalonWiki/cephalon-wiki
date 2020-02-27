@@ -61,7 +61,7 @@ class RedditBot:
         self.logger.info("Comment text:  %s", comment.body.strip().replace("\n", "\t"))
 
         # preparing response using the module
-        response = self.response(comment.body)
+        response = self.response(comment)
         if response:
             self.logger.info("Comment response:")
             for s in response.strip().split("\n"):
@@ -74,7 +74,7 @@ class RedditBot:
                 self.logger.error(traceback.format_exc())
                 self.logger.error("Reddit API exception raised.  Unable to reply to comment %s", comment)
 
-    def scan(self, stream = None):
+    def scan(self, stream=None):
         # Stream set-up
         # Subreddit comment stream must be re-initialized after exception
         # Otherwise, make a copy of the stream because...I forgot?  lolz

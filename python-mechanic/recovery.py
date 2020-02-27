@@ -4,14 +4,14 @@ import time
 import subprocess
 
 import RedditBotCephalonWiki
-import articles_list
+import warframeWikiArticles
 
 recovery_bot = None
 reboot = 0
 
 try:
     # Regenerate articles list
-    articles_list.generate()
+    warframeWikiArticles.generate()
 
     recovery_bot = RedditBotCephalonWiki.RedditBotCephalonWiki(name="recovery-cephalon-wiki")
     recovery_bot.logger.info("Reviewing comments from hot and new posts.")

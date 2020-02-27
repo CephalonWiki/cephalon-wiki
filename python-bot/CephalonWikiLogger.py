@@ -21,6 +21,7 @@ comparison.setLevel(logging.DEBUG)
 spell_checker = logging.getLogger('spell_checker')
 spell_checker.setLevel(logging.DEBUG)
 
+loggers = [cephalon, scrapper, comparison, spell_checker]
 
 ############
 # handlers #
@@ -69,7 +70,7 @@ warning_log.addFilter(LevelFilter([logging.WARNING]))
 # Add formatters to handlers #
 ##############################
 
-formatter = logging.Formatter('%(asctime)s - %(levelname)10s - %(name)22s - %(funcName)22s -  %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(levelname)10s - %(name)22s - %(funcName)22s - %(lineno)4d - %(message)s')
 
 # all files have the same format
 console.setFormatter(formatter)

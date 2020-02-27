@@ -4,14 +4,14 @@ import requests
 import json
 from lxml import html
 
-import articles_list
-import spell_checker
+import warframeWikiArticles
+import tagSpellChecker
 
 import tagParser
 
 from CephalonWikiLogger import scrapper
 
-articles = articles_list.load()
+articles = warframeWikiArticles.load()
 
 def format_polarity(mod_polarity):
     polarity_letter = ""
@@ -56,12 +56,13 @@ def get_title(tag):
                 return tag
 
         # Try spell checker
-        corrected_title = spell_checker.correction(tag)
+        corrected_title = tagSpellChecker.correction(tag)
         if corrected_title != tag and len(tag) > 4:
             return corrected_title
         else:
             scrapper.warning("No correction found for title %s.", tag)
             return tag
+
 
 # Given an article title, searches for article on wiki
 def get_article_info(title):
@@ -90,10 +91,9 @@ def get_article_info(title):
     except KeyError as e:
         scrapper.error("KeyError: with " + str(e) + " for title " + title)
         return article_info
-    except:
+    except Exception:
         scrapper.error("Look-up failed for title " + title)
         return article_info
-
 
     # attempt to determine article type
     article_type = ""
@@ -112,7 +112,7 @@ def get_article_info(title):
             for i in sorted(article_tags):
                 t = article_tags[i]
                 if t == ":" + article_info['title'] + "/Main":
-                    #redirect for Warframes and Archwings
+                    # redirect for Warframes and Archwings
                     article_type = "Warframe or Archwing"
                     break
                 elif "\n| name" in t:
@@ -140,7 +140,7 @@ def get_article_info(title):
     return article_info
 
 
-def get_article_summary(title, detail=True, info = None):
+def get_article_summary(title, detail=True, info=None):
 
     if info:
         article_info = info

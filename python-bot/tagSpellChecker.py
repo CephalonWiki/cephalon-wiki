@@ -3,12 +3,12 @@
 import string
 from collections import Counter
 
-import articles_list
+import warframeWikiArticles
 from CephalonWikiLogger import spell_checker
 
 
 # will use lower case words for the dictionary
-articles = articles_list.load()
+articles = warframeWikiArticles.load()
 WORDS = Counter(articles.keys())
 
 def P(word, N=sum(WORDS.values())):

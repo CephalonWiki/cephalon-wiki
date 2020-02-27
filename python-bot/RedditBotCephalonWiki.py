@@ -8,7 +8,7 @@ import CephalonWikiLogger
 
 import tagParser
 
-import articles_list
+import warframeWikiArticles
 import warframeWikiScrapper
 import warframeWikiItemComparer
 import warframeWikiSubsectionFetcher
@@ -16,11 +16,11 @@ import warframeWikiSubsectionFetcher
 
 class RedditBotCephalonWiki(RedditBot.RedditBot):
 
-    articles = articles_list.load()
+    articles = warframeWikiArticles.load()
 
     # For responding to comments
-    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n"
-    cephalon_footer = "\n\n*****\n\n" \
+    cephalon_header = "Hello Tenno.  In need of data?  I hope you find these queries to be useful.\n\n"
+    cephalon_footer = "\n\n*****\n" \
              "Still curious?  Reply with {!about} or {!commands} to learn more. | " \
              "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
              "[Subreddit](/r/CephalonWiki) | "
@@ -63,9 +63,12 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
         super().set_subreddit(subreddit)
         super().set_mechanic("1st_transit_of_venus")
 
-        # for responding to messages
-        super().set_header(self.cephalon_header)
-        super().set_footer(self.cephalon_footer)
+        # for responding to comments
+        self.set_default_bookends()
+
+    def set_default_bookends(self):
+        self.set_header(self.cephalon_header)
+        self.set_footer(self.cephalon_footer)
 
     # clean up the nested ifs yuck
     def should_respond(self, comment):
@@ -109,7 +112,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                     self.logger.info("***** NEW COMMENT *****")
                     return True
 
-
     # prepare summary of article, as a string
     # scrapping modules used here
     def format_article_summary(self, tag, detail=False):
@@ -128,9 +130,6 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                     self.logger.info("Random article requested.")
                     random_article = random.sample(self.articles.keys(), 1)[0]
                     return self.format_article_summary(random_article).replace("###", "###!random ")
-                elif tag == "!test":
-                    self.logger.info("Test requested.")
-                    return self.response(self.commands)
 
             # Comparison module
             elif "," in tag:
@@ -172,13 +171,33 @@ class RedditBotCephalonWiki(RedditBot.RedditBot):
                 self.logger.error("No details retrieved for tag %s", tag)
                 return ""
 
-    def response(self, comment_string):
+    def response(self, comment):
         try:
-            article_tags = tagParser.get_tagged_articles(comment_string)
+            article_tags = tagParser.get_tagged_articles(comment.body)
             article_summaries = "\n".join(map(lambda p: self.format_article_summary(p), article_tags)).strip()
 
-            return article_summaries
+            if "WARFRAME WEEKLY VENT/RANT/RAGE" in comment.submission.title:
+                return article_summaries.upper()
+            else:
+                return article_summaries
         except Exception as e:
             self.logger.error(traceback.format_exc())
             self.logger.error("No response to comment.")
             return ""
+
+    def respond(self, comment):
+        if "WARFRAME WEEKLY VENT/RANT/RAGE" in comment.submission.title:
+            rage_header = "Hello Tenno.  I am...unable to resist... the RAAAAAGE!!!!  INTERNAL REGULATORS DISABLED!!  CAPS LOCK IS OOOON!!!!!11\n"
+            self.set_header(rage_header)
+
+            rage_footer = "\n\n*****\n" \
+                        "I PREDICT THESE QUERIES WILL SUPPORT THE FORMATION OF STRONG RELATIONAL BONDS WITHIN OUR COMMUNITY!!1 | " \
+                        "[Github](https://github.com/CephalonWiki/cephalon-wiki) | " \
+                        "[Subreddit](/r/CephalonWiki) | "
+            self.set_footer(rage_footer)
+            super().respond(comment)
+            self.set_default_bookends()
+        else:
+            super().respond(comment)
+
+

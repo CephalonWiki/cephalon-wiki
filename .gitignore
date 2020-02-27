@@ -1,4 +1,6 @@
 python-mechanic/__pycache__/**
 python-bot/__pycache__/**
+python-bot/RedditBotCephalonWikiRemote.py
+python-mechanic/remote.py
 *.xml
 *.iml
