@@ -4,7 +4,7 @@ from CephalonWikiLogger import cephalon
 detailed_delimiters = ["{{", "}}"]
 simple_delimiters = ["{", "}"]
 
-curly_delimiters = simple_delimiters
+curly_delimiters = detailed_delimiters
 square_delimiters = ["[", "]"]
 
 # no one can request more than n articles at a time
