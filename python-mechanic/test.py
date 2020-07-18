@@ -31,9 +31,11 @@ if __name__ == "__main__":
 
         for t in test_cases:
             pprint("\n")
-            pprint(t)
             pprint("==================")
-            pprint(test_bot.format_article_summary(t))
+            if test_bot.format_article_summary(t):
+                pprint("%s:  OK!".format(t))
+            else:
+                pprint("%s:  FAILURE :(".format(t))
             pprint("++++++++++++++")
 
         for l in CephalonWikiLogger.loggers:

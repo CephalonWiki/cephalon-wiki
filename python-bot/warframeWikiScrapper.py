@@ -111,7 +111,7 @@ def get_article_info(title):
             # Determining type
             for i in sorted(article_tags):
                 t = article_tags[i]
-                if t == ":" + article_info['title'] + "/Main":
+                if t == ":" + article_info['title'] + "/Main" or t.startswith("WarframePage"):
                     # redirect for Warframes and Archwings
                     article_type = "Warframe or Archwing"
                     break

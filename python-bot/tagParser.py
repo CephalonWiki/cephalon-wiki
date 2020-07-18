@@ -4,7 +4,7 @@ from CephalonWikiLogger import cephalon
 detailed_delimiters = ["{{", "}}"]
 simple_delimiters = ["{", "}"]
 
-curly_delimiters = detailed_delimiters
+curly_delimiters = simple_delimiters
 square_delimiters = ["[", "]"]
 
 # no one can request more than n articles at a time
@@ -59,7 +59,7 @@ def format_comment(comment_string):
                 cephalon.warning("Ignoring paragraph in comment.  Indented Block:  " + p.replace("\n", "\t"))
                 comment_paragraphs.remove(p)
 
-    return "\n\n".join(comment_paragraphs)
+    return "\n\n".join(comment_paragraphs).replace(detailed_delimiters[0],simple_delimiters[0]).replace(detailed_delimiters[1], simple_delimiters[1])
 
 
 def format_tag(tag_string):
@@ -104,4 +104,4 @@ def get_tagged_articles(comment_string):
     # only keep article_request_limit many titles
     article_titles = [format_tag(t) for t in curly_titles[:article_request_limit]]
 
-    return article_titles
+    return list(set(article_titles))
